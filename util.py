@@ -104,7 +104,9 @@ def bicubic_interpolation(patches: np.ndarray):
     for channel_idx in [0, 1]:
         for i in range(batch_size):
             upsampled_patches[i, channel_idx, :, :] = np.array(
-                Image.fromarray(patches[i, channel_idx, :, :]).resize((100, 100), Image.BICUBIC)
+                Image.fromarray(patches[i, channel_idx, :, :]).resize(
+                    (100, 100), Image.BICUBIC
+                )
             )
 
     return upsampled_patches
