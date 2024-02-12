@@ -1,5 +1,7 @@
 import numpy as np
 
+from PIL import Image
+
 
 def extract_patches(path: str):
     """Converts the raw NREL Wind Toolkit data into patches of
@@ -35,3 +37,27 @@ def downsample(patches: np.ndarray):
         np.ndarray: array of the downsampled patches.
     """
     return patches[:, ::5, ::5]
+
+
+def bicubic_interpolation(patches: np.ndarray):
+    """_summary_
+
+    Args:
+        patches (np.ndarray): Array of size (batch_size, 20, 20) which
+        to be upsampled using bicubic interpolation to an array of size
+        (batch_size, 100, 100).
+
+    Returns:
+        np.ndarray: array of the upsampled patches.
+    """
+
+    batch_size = patches.shape[0]
+
+    upsampled_patches = np.zeros((batch_size, 100, 100))
+
+    for i in range(batch_size):
+        upsampled_patches[i, :, :] = np.array(
+            Image.fromarray(patches[i, :, :]).resize((100, 100), Image.BICUBIC)
+        )
+
+    return upsampled_patches
