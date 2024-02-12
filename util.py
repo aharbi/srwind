@@ -22,3 +22,16 @@ def extract_patches(path: str):
     va_patches = va.reshape(16, 100, 16, 100).swapaxes(1, 2).reshape(-1, 100, 100)
 
     return ua_patches, va_patches
+
+
+def downsample(patches: np.ndarray):
+    """_summary_
+
+    Args:
+        patches (np.ndarray): Array of size (batch_size, 100, 100) which
+        to be downsampled to an array of size (batch_size, 20, 20).
+
+    Returns:
+        np.ndarray: array of the downsampled patches.
+    """
+    return patches[:, ::5, ::5]
