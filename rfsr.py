@@ -58,17 +58,17 @@ def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
         )
 
         current_ua_first_ord = ndimage.gaussian_filter(
-            current_ua_subpatch, sigma=5, order=1, mode="wrap"
+            current_ua_subpatch, sigma=5, order=1, mode="nearest"
         )
         current_va_first_ord = ndimage.gaussian_filter(
-            current_va_subpatch, sigma=5, order=1, mode="wrap"
+            current_va_subpatch, sigma=5, order=1, mode="nearest"
         )
 
         current_ua_second_ord = ndimage.gaussian_filter(
-            current_ua_subpatch, sigma=5, order=2, mode="wrap"
+            current_ua_subpatch, sigma=5, order=2, mode="nearest"
         )
         current_va_second_ord = ndimage.gaussian_filter(
-            current_va_subpatch, sigma=5, order=2, mode="wrap"
+            current_va_subpatch, sigma=5, order=2, mode="nearest"
         )
 
         X_ua_upsampled[i * 25 : i * 25 + 25, :] = current_ua_subpatch.reshape(
