@@ -19,7 +19,7 @@ def plot_random_sample(path: str):
     wind_profile_HR_sample = wind_profile[0, 750:850, 750:850]
     wind_profile_LR_sample = wind_profile_HR_sample[::5, ::5]
 
-    fig, axs = plt.subplots(2, 2)
+    fig, axs = plt.subplots(2, 2, dpi=300)
 
     # westward (ua) wind component sample
     axs[0, 0].imshow(wind_profile[0, :, :])
@@ -44,6 +44,7 @@ def plot_random_sample(path: str):
     fig.set_size_inches(6.75, 6.75)
     fig.tight_layout()
 
+    fig.savefig("figures/data_sample.png")
     plt.show()
 
 
