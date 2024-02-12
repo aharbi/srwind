@@ -5,25 +5,30 @@ import numpy as np
 from PIL import Image
 
 
-def create_subsampled_dataset(path: str, sample_size: int):
+def create_subsampled_dataset(path: str, sample_size: int = None):
     """Creates a data and label tensors from the raw NREL
     Wind Toolkit data.
 
     Args:
         path (str): Path to the dataset.
         sample_size (int): Number of files to select from the original
-        dataset.
+        dataset. Defualts to the whole dataset if no sample size is specified.
 
     Returns:
         tuple: Data tensor of shape (256 * sample_size, 2, 20, 20) and
         a label tensor of shape (256 * sample_size, 2, 100, 100).
     """
 
+    file_names = os.listdir(path)
+    file_names_samples = (
+        file_names if sample_size == None else random.sample(file_names, sample_size)
+    )
+
+    if sample_size == None:
+        sample_size = len(file_names)
+
     data_matrix = np.zeros((256 * sample_size, 2, 20, 20))
     label_matrix = np.zeros((256 * sample_size, 2, 100, 100))
-
-    file_names = os.listdir(path)
-    file_names_samples = random.sample(file_names, sample_size)
 
     for index, file in enumerate(file_names_samples):
         raw_data = np.load(os.path.join(path, file))
@@ -41,7 +46,7 @@ def create_subsampled_dataset(path: str, sample_size: int):
         )
 
         label_matrix[(index * 256) : (index * 256 + 256), 0, :, :] = ua_patches
-        label_matrix[(index * 256) : (index * 256 + 256), 0, :, :] = uv_patches
+        label_matrix[(index * 256) : (index * 256 + 256), 1, :, :] = uv_patches
 
     return data_matrix, label_matrix
 
@@ -84,7 +89,7 @@ def bicubic_interpolation(patches: np.ndarray):
     """Performs upsampling on the given input patches using bicubic interpolation.
 
     Args:
-        patches (np.ndarray): Array of size (batch_size, 20, 20) which
+        patches (np.ndarray): Array of size (batch_size, 2, 20, 20) which
         to be upsampled using bicubic interpolation to an array of size
         (batch_size, 100, 100).
 
@@ -94,11 +99,12 @@ def bicubic_interpolation(patches: np.ndarray):
 
     batch_size = patches.shape[0]
 
-    upsampled_patches = np.zeros((batch_size, 100, 100))
+    upsampled_patches = np.zeros((batch_size, 2, 100, 100))
 
-    for i in range(batch_size):
-        upsampled_patches[i, :, :] = np.array(
-            Image.fromarray(patches[i, :, :]).resize((100, 100), Image.BICUBIC)
-        )
+    for channel_idx in [0, 1]:
+        for i in range(batch_size):
+            upsampled_patches[i, channel_idx, :, :] = np.array(
+                Image.fromarray(patches[i, channel_idx, :, :]).resize((100, 100), Image.BICUBIC)
+            )
 
     return upsampled_patches
