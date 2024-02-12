@@ -145,5 +145,6 @@ if __name__ == "__main__":
         "oob_score": True,
     }
 
-    # Train a model for ua wind component
-    random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="ua")
+    # Train a model for ua and va wind component
+    random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
+    random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
