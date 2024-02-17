@@ -4,7 +4,10 @@ import numpy as np
 import util
 
 from scipy import ndimage
+
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+
 from skimage.util.shape import view_as_windows
 
 
@@ -228,7 +231,6 @@ if __name__ == "__main__":
     # Train a basic random forest model
     data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 1)
 
-    """
     X, Y = generate_features(data_matrix, label_matrix)
 
     rf_args = {
@@ -241,9 +243,9 @@ if __name__ == "__main__":
     }
 
     # Train a model for ua and va wind component
-    #random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
-    #random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
-    
+    random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
+    # random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
+    """
     #model_path_ua = "models/rfsr_ua.pkl"
     #model_path_va = "models/rfsr_ua.pkl"
 
