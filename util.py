@@ -91,7 +91,7 @@ def bicubic_interpolation(patches: np.ndarray):
     Args:
         patches (np.ndarray): Array of size (batch_size, 2, 20, 20) which
         to be upsampled using bicubic interpolation to an array of size
-        (batch_size, 100, 100).
+        (batch_size, 2, 100, 100).
 
     Returns:
         np.ndarray: array of the upsampled patches.
@@ -110,3 +110,37 @@ def bicubic_interpolation(patches: np.ndarray):
             )
 
     return upsampled_patches
+
+
+def reconstruct_blocks(blocks: np.ndarray):
+    """Reconstruct an overlapping block-wise array into a single
+    array, where the overlapping segments are averaged.
+
+    Args:
+        blocks (np.ndarray): array of shape (17, 17, 20, 20)
+
+    Returns:
+        np.ndarray: array of shape (100, 100)
+    """
+
+    reconstructed_matrix = np.zeros((100, 100), dtype=float)
+    count_matrix = np.zeros((100, 100), dtype=float)
+
+    stride = 5
+    window_shape = 20
+
+    for i in range(blocks.shape[0]):
+        for j in range(blocks.shape[1]):
+            block = blocks[i, j]
+            reconstructed_matrix[
+                i * stride : i * stride + window_shape,
+                j * stride : j * stride + window_shape,
+            ] += block
+            count_matrix[
+                i * stride : i * stride + window_shape,
+                j * stride : j * stride + window_shape,
+            ] += 1
+
+    reconstructed_matrix /= count_matrix
+
+    return reconstructed_matrix
