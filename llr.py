@@ -6,7 +6,7 @@ import util
 from scipy import ndimage
 
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 
 from skimage.util.shape import view_as_windows
 
@@ -160,6 +160,23 @@ def random_forest_super_resolution(
     joblib.dump(rf, os.path.join(save_path, name))
 
 
+def linear_regression_super_resolution(
+    X: np.ndarray, Y: np.ndarray, save_path: str, lr_args: dict, name: str = "lr.pkl"
+):
+    """Trains a linear regression model for super resolution.
+
+    Args:
+        X (np.ndarray): Data matrix of shape (num_examples, num_features).
+        Y (np.ndarray): Label matrix of shape (num_examples, num_outputs).
+        save_path (str): Path of where the trained model is saved.
+        lr_args (dict): Hyperparameters and arguments of the random forest model.
+        name (str, optional): Name of the saved model. Defaults to "lr.pkl".
+    """
+    rf = Ridge(**lr_args)
+    rf.fit(X, Y)
+
+    joblib.dump(rf, os.path.join(save_path, name))
+
 def predict_block(data_matrix: np.ndarray, model):
     """Perform block-wise prediction of a given test example.
 
@@ -229,7 +246,7 @@ def predict(data_matrix, model_path_ua, model_path_va):
 
 if __name__ == "__main__":
     # Train a basic random forest model
-    data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 1)
+    data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 50)
 
     X, Y = generate_features(data_matrix, label_matrix)
 
@@ -242,12 +259,21 @@ if __name__ == "__main__":
         "oob_score": True,
     }
 
+    lr_args = {
+        "alpha": 0.5,
+        "fit_intercept": True
+    }
+
     # Train a model for ua and va wind component
     random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
-    # random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
-    """
-    #model_path_ua = "models/rfsr_ua.pkl"
-    #model_path_va = "models/rfsr_ua.pkl"
+    random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
+    
+    linear_regression_super_resolution(X[0], Y[0], "models/", lr_args, name="lr_ua.pkl")
+    linear_regression_super_resolution(X[1], Y[1], "models/", lr_args, name="lr_va.pkl")
 
-    #Y = predict(data_matrix, model_path_ua, model_path_va)
-    """
+    model_path_ua = "models/lr_ua.pkl"
+    model_path_va = "models/lr_va.pkl"
+
+    Y = predict(data_matrix, model_path_ua, model_path_va)
+    #print(Y.shape)
+    
