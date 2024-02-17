@@ -5,6 +5,7 @@ import util
 
 from scipy import ndimage
 from sklearn.ensemble import RandomForestRegressor
+from skimage.util.shape import view_as_windows
 
 
 def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
@@ -58,17 +59,18 @@ def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
         )
 
         current_ua_first_ord = ndimage.gaussian_filter(
-            current_ua_subpatch, sigma=5, order=1, mode="nearest"
+            current_ua_subpatch, sigma=5, order=1, mode="nearest", axes=(1, 2)
         )
+
         current_va_first_ord = ndimage.gaussian_filter(
-            current_va_subpatch, sigma=5, order=1, mode="nearest"
+            current_va_subpatch, sigma=5, order=1, mode="nearest", axes=(1, 2)
         )
 
         current_ua_second_ord = ndimage.gaussian_filter(
-            current_ua_subpatch, sigma=5, order=2, mode="nearest"
+            current_ua_subpatch, sigma=5, order=2, mode="nearest", axes=(1, 2)
         )
         current_va_second_ord = ndimage.gaussian_filter(
-            current_va_subpatch, sigma=5, order=2, mode="nearest"
+            current_va_subpatch, sigma=5, order=2, mode="nearest", axes=(1, 2)
         )
 
         X_ua_upsampled[i * 25 : i * 25 + 25, :] = current_ua_subpatch.reshape(
@@ -113,6 +115,30 @@ def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
     return (X_ua, X_va), (Y_ua, Y_va)
 
 
+def generate_block_features(block_matrix: np.ndarray):
+    """Generates feature blocks for testing datasets. The input is an
+    array which represents an overlapping blocks of a test sample.
+
+    Args:
+        block_matrix (np.ndarray): array of shape (17, 17, 20, 20) where
+        the first two dimensions represent block indicies.
+
+    Returns:
+        np.ndarray: features matrix as an array of shape (289, 1200)
+    """
+    X_upsampled = block_matrix.reshape(-1, 20 * 20)
+
+    X_first_ord = ndimage.gaussian_filter(
+        block_matrix, sigma=5, order=1, mode="nearest", axes=[2, 3]
+    ).reshape(-1, 20 * 20)
+    X_second_ord = ndimage.gaussian_filter(
+        block_matrix, sigma=5, order=2, mode="nearest", axes=[2, 3]
+    ).reshape(-1, 20 * 20)
+
+    X = np.hstack((X_upsampled, X_first_ord, X_second_ord))
+    return X
+
+
 def random_forest_super_resolution(
     X: np.ndarray, Y: np.ndarray, save_path: str, rf_args: dict, name: str = "rfsr.pkl"
 ):
@@ -131,9 +157,71 @@ def random_forest_super_resolution(
     joblib.dump(rf, os.path.join(save_path, name))
 
 
+def predict_block(data_matrix: np.ndarray, model):
+    """Perform block-wise prediction of a given test example.
+
+    Args:
+        data_matrix (np.ndarray): array of shape (17, 17, 20, 20).
+        model : prediction model (e.g., RandomForestRegressor).
+
+    Returns:
+        np.ndarray: array of predictions of shape (17, 17, 20, 20).
+    """
+    X = generate_block_features(data_matrix)
+
+    model.verbose = False
+    R = model.predict(X)
+
+    Y = X[:, :400] + R
+    Y = Y.reshape(17, 17, 20, 20, order="C")
+    return Y
+
+
+def predict(data_matrix, model_path):
+    """Performs predictions on a given dataset.
+
+    Args:
+        data_matrix (np.ndarray): data matrix of shape (batch_size, 2, 20, 20).
+        model_path (str): path to the prediction model pickle file.
+
+    Returns:
+        np.ndarray: array of predictions of shape (batch_size, 2, 100, 100).
+    """
+
+    model = joblib.load(model_path)
+
+    n = data_matrix.shape[0]
+    predictions = np.zeros((n, 2, 100, 100))
+
+    for i in range(n):
+        current_example = data_matrix[i, :, :, :]
+        current_example = np.expand_dims(current_example, 0)
+
+        current_example_bicubic = util.bicubic_interpolation(data_matrix)
+
+        for channel_idx in [0, 1]:
+            current_example_blocks = view_as_windows(
+                current_example_bicubic[i, channel_idx, :, :], 20, 5
+            )
+
+            current_example_blocks_predictions = predict_block(
+                current_example_blocks, model
+            )
+
+            current_example_reconstruct = util.reconstruct_blocks(
+                current_example_blocks_predictions
+            )
+
+            predictions[i, channel_idx, :, :] = current_example_reconstruct
+
+    return predictions
+
+
 if __name__ == "__main__":
     # Train a basic random forest model
     data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 1)
+
+    """
     X, Y = generate_features(data_matrix, label_matrix)
 
     rf_args = {
@@ -146,5 +234,10 @@ if __name__ == "__main__":
     }
 
     # Train a model for ua and va wind component
-    random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
-    random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
+    #random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
+    #random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
+    
+    model_path = "models/rfsr_ua.pkl"
+
+    Y = predict(data_matrix, model_path)
+    """
