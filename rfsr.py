@@ -177,18 +177,20 @@ def predict_block(data_matrix: np.ndarray, model):
     return Y
 
 
-def predict(data_matrix, model_path):
+def predict(data_matrix, model_path_ua, model_path_va):
     """Performs predictions on a given dataset.
 
     Args:
         data_matrix (np.ndarray): data matrix of shape (batch_size, 2, 20, 20).
-        model_path (str): path to the prediction model pickle file.
+        model_path_ua (str): path to the ua component prediction model pickle file.
+        model_path_va (str): path to the va component prediction model pickle file.
 
     Returns:
         np.ndarray: array of predictions of shape (batch_size, 2, 100, 100).
     """
 
-    model = joblib.load(model_path)
+    model_ua = joblib.load(model_path_ua)
+    model_va = joblib.load(model_path_va)
 
     n = data_matrix.shape[0]
     predictions = np.zeros((n, 2, 100, 100))
@@ -204,9 +206,14 @@ def predict(data_matrix, model_path):
                 current_example_bicubic[i, channel_idx, :, :], 20, 5
             )
 
-            current_example_blocks_predictions = predict_block(
-                current_example_blocks, model
-            )
+            if channel_idx == 0:
+                current_example_blocks_predictions = predict_block(
+                    current_example_blocks, model_ua
+                )
+            else:
+                current_example_blocks_predictions = predict_block(
+                    current_example_blocks, model_va
+                )
 
             current_example_reconstruct = util.reconstruct_blocks(
                 current_example_blocks_predictions
@@ -237,7 +244,8 @@ if __name__ == "__main__":
     #random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
     #random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
     
-    model_path = "models/rfsr_ua.pkl"
+    #model_path_ua = "models/rfsr_ua.pkl"
+    #model_path_va = "models/rfsr_ua.pkl"
 
-    Y = predict(data_matrix, model_path)
+    #Y = predict(data_matrix, model_path_ua, model_path_va)
     """
