@@ -263,10 +263,10 @@ if __name__ == "__main__":
         "alpha": 0.5,
         "fit_intercept": True
     }
-
+    
     # Train a model for ua and va wind component
-    random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
-    random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
+    #random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
+    #random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
     
     linear_regression_super_resolution(X[0], Y[0], "models/", lr_args, name="lr_ua.pkl")
     linear_regression_super_resolution(X[1], Y[1], "models/", lr_args, name="lr_va.pkl")

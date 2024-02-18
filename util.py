@@ -51,6 +51,37 @@ def create_subsampled_dataset(path: str, sample_size: int = None):
     return data_matrix, label_matrix
 
 
+def create_single_file_dataset(path: str):
+    """Creates a data and label tensors from the raw NREL
+    Wind Toolkit data of a single file (Used mostly at inference time).
+
+    Args:
+        path (str): Path to the dataset.
+
+    Returns:
+        tuple: Data tensor of shape (256 * sample_size, 2, 20, 20) and
+        a label tensor of shape (256 * sample_size, 2, 100, 100).
+    """
+
+    data_matrix = np.zeros((256, 2, 20, 20))
+    label_matrix = np.zeros((256, 2, 100, 100))
+
+    raw_data = np.load(path)
+
+    ua_patches, uv_patches = extract_patches(raw_data)
+
+    ua_patches_downsampled = downsample(ua_patches)
+    va_patches_downsampled = downsample(uv_patches)
+
+    data_matrix[:, 0, :, :] = ua_patches_downsampled
+    data_matrix[:, 1, :, :] = va_patches_downsampled
+
+    label_matrix[:, 0, :, :] = ua_patches
+    label_matrix[:, 1, :, :] = uv_patches
+
+    return data_matrix, label_matrix
+
+
 def extract_patches(raw_data: np.ndarray):
     """Converts the raw NREL Wind Toolkit data into patches of
     size 100 by 100 pixels.

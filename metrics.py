@@ -1,4 +1,7 @@
+import os
 import numpy as np
+import util
+import llr
 
 
 def peak_signal_to_noise_ratio(ref_patch: np.ndarray, HR_patch: np.ndarray):
@@ -68,7 +71,7 @@ def kinetic_energy_spectra(patch: np.ndarray):
 
 
 def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
-    """Computes the performance metrics given the reference HR patches and
+    """Computes the performance metrics per patch given the reference HR patches and
     the predicted HR patches.
 
     Args:
@@ -76,36 +79,113 @@ def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
         HR_patches (np.ndarray): Array of size (batch_size, 2, 100, 100)
 
     Returns:
-        tuple: computed metrics as a tuple (PSNR, MSE, MAE, SSIM)
+        np.ndarray: computed metrics as an array with batch_size rows and
+        two columns representing the wind componenets with a depth of four
+        representing the computed metrics (PSNR, MSE, MAE, SSIM).
     """
 
-    psnr_log = []
-    mse_log = []
-    mae_log = []
-    ssim_log = []
+    psnr_log_ua = []
+    psnr_log_va = []
+
+    mse_log_ua = []
+    mse_log_va = []
+
+    mae_log_ua = []
+    mae_log_va = []
+
+    ssim_log_ua = []
+    ssim_log_va = []
 
     n = ref_patches.shape[0]
-    for channel_idx in [0, 1]:
-        for i in range(n):
-            psnr_log.append(
-                peak_signal_to_noise_ratio(
-                    ref_patches[i, channel_idx, :, :], HR_patches[i, channel_idx, :, :]
-                )
-            )
-            mse_log.append(
-                mean_squared_error(
-                    ref_patches[i, channel_idx, :, :], HR_patches[i, channel_idx, :, :]
-                )
-            )
-            mae_log.append(
-                mean_absolute_error(
-                    ref_patches[i, channel_idx, :, :], HR_patches[i, channel_idx, :, :]
-                )
-            )
+    for i in range(n):
+        psnr_log_ua.append(
+            peak_signal_to_noise_ratio(ref_patches[i, 0, :, :], HR_patches[i, 1, :, :])
+        )
+        mse_log_ua.append(
+            mean_squared_error(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
+        )
+        mae_log_ua.append(
+            mean_absolute_error(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
+        )
 
-    avg_psnr = np.mean(psnr_log)
-    avg_mse = np.mean(mse_log)
-    avg_mae = np.mean(mae_log)
-    avg_ssim = 0
+        psnr_log_va.append(
+            peak_signal_to_noise_ratio(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
+        )
+        mse_log_va.append(
+            mean_squared_error(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
+        )
+        mae_log_va.append(
+            mean_absolute_error(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
+        )
 
-    return avg_psnr, avg_mse, avg_mae, avg_ssim
+    metrics_array = np.zeros((n, 2, 4))
+
+    metrics_array[:, 0, 0] = psnr_log_ua
+    metrics_array[:, 0, 1] = mse_log_ua
+    metrics_array[:, 0, 2] = mae_log_ua
+    # metrics_array[:, 0, 3] = ssim_log_ua
+
+    metrics_array[:, 1, 0] = psnr_log_va
+    metrics_array[:, 1, 1] = mse_log_va
+    metrics_array[:, 1, 2] = mae_log_va
+    # metrics_array[:, 1, 3] = ssim_log_ua
+
+    return metrics_array
+
+
+def compute_metrics_llr(path: str, model_path_ua, model_path_va, save_path):
+
+    file_names = os.listdir(path)
+    n = len(file_names)
+
+    metrics_array = np.zeros((256 * n, 2, 4))
+
+    for i, file_name in enumerate(file_names):
+        current_data_matrix, current_label_matrix = util.create_single_file_dataset(
+            os.path.join(path, file_name)
+        )
+
+        prediction_lr = llr.predict(current_data_matrix, model_path_ua, model_path_va)
+
+        metrics_array[i * 256 : i * 256 + 256, :, :] = compute_metrics(
+            current_label_matrix, prediction_lr
+        )
+
+        print("Current Iteration (LLR): {} / {}".format(i, n))
+
+        if i == 1:
+            break
+
+    with open(save_path, "wb") as f:
+        np.save(f, metrics_array)
+
+    return metrics_array
+
+
+def compute_metrics_bicubic(path: str, save_path):
+
+    file_names = os.listdir(path)
+    n = len(file_names)
+
+    metrics_array = np.zeros((256 * n, 2, 4))
+
+    for i, file_name in enumerate(file_names):
+        current_data_matrix, current_label_matrix = util.create_single_file_dataset(
+            os.path.join(path, file_name)
+        )
+
+        prediction_bi = util.bicubic_interpolation(current_data_matrix)
+
+        metrics_array[i * 256 : i * 256 + 256, :, :] = compute_metrics(
+            current_label_matrix, prediction_bi
+        )
+
+        print("Current Iteration (Bicubic): {} / {}".format(i, n))
+
+        if i == 5:
+            break
+
+    with open(save_path, "wb") as f:
+        np.save(f, metrics_array)
+
+    return metrics_array

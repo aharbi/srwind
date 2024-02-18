@@ -1,3 +1,4 @@
+import numpy as np
 import util
 import llr
 import metrics
@@ -7,25 +8,31 @@ def exp_1():
     """Experiment 1: Compares the performance of a ridge regression model
     to bicubic interpolation on the validation.
     """
-    dataset = "val"
-
-    data_matrix, label_matrix = util.create_subsampled_dataset(
-        "dataset/{}/".format(dataset)
-    )
- 
-    model_path_ua = "models/lr_ua.pkl"
-    model_path_va = "models/lr_va.pkl"
-    prediction_lr = llr.predict(
-        data_matrix, model_path_ua, model_path_va
+    metrics_array_rr = metrics.compute_metrics_llr(
+        "dataset/val/", "models/lr_ua.pkl", "models/lr_va.pkl", "results/rr_val_metrics"
     )
 
-    prediction_bi = util.bicubic_interpolation(data_matrix)
+    metrics_array_bicubic = metrics.compute_metrics_bicubic(
+        "dataset/val/", "results/bicubic_val_metrics"
+    )
 
-    calc_metrics_bi = metrics.compute_metrics(label_matrix, prediction_bi)
-    calc_metrics_lr = metrics.compute_metrics(label_matrix, prediction_lr)
+    psnr_rr = np.vstack([metrics_array_rr[:, 0, 0], metrics_array_rr[:, 1, 0]]).mean()
+    mse_rr = np.vstack([metrics_array_rr[:, 0, 1], metrics_array_rr[:, 1, 1]]).mean()
+    mae_rr = np.vstack([metrics_array_rr[:, 0, 2], metrics_array_rr[:, 1, 2]]).mean()
 
-    print(calc_metrics_bi)
-    print(calc_metrics_lr)
+    psnr_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 0], metrics_array_bicubic[:, 1, 0]]
+    ).mean()
+    mse_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 1], metrics_array_bicubic[:, 1, 1]]
+    ).mean()
+    mae_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 2], metrics_array_bicubic[:, 1, 2]]
+    ).mean()
+
+    print("PSNR: ", psnr_rr, psnr_bicubic)
+    print("MSE: ", mse_rr, mse_bicubic)
+    print("MAE: ", mae_rr, mae_bicubic)
 
 
 if __name__ == "__main__":
