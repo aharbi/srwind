@@ -153,9 +153,6 @@ def compute_metrics_llr(path: str, model_path_ua, model_path_va, save_path):
 
         print("Current Iteration (LLR): {} / {}".format(i, n))
 
-        if i == 1:
-            break
-
     with open(save_path, "wb") as f:
         np.save(f, metrics_array)
 
@@ -181,9 +178,6 @@ def compute_metrics_bicubic(path: str, save_path):
         )
 
         print("Current Iteration (Bicubic): {} / {}".format(i, n))
-
-        if i == 5:
-            break
 
     with open(save_path, "wb") as f:
         np.save(f, metrics_array)
