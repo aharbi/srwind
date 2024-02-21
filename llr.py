@@ -7,58 +7,71 @@ from scipy import ndimage
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
+from sklearn.decomposition import PCA
 
 from skimage.util.shape import view_as_windows
 
 
-def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
+def generate_features(
+    data_matrix: np.ndarray, label_matrix: np.ndarray, window_size: int
+):
     """Generates features for residual training in traditional regression techniques.
-    The features consist of the original patch, the first order difference,
-    and the second order difference.
+    The features consist of the original patch, the first order difference, and the
+    second order difference. A rolling window of size window_size is applied to each
+    image to generate smaller patches. Then, for each smaller segment, the features
+    are computed and sorted in a data matrix.
 
     Args:
         data_matrix (np.ndarray): Input data matrix of shape (batch_size, 2, 20, 20)
         label_matrix (np.ndarray): Input label matrix of shape (batch_size, 2, 100, 100)
+        window_size (int): Size of the square rolling window applied to each patch.
 
     Returns:
-        (tuple, tuple): _description_
+        (tuple, tuple): First tuple contains the data matricies for each wind componenet.
+        The shape of each matrix is (batch_size * num_patches, 3 * window_size * window_size).
+        The second tuple contains the labels matrix for each wind component, which represent the
+        residual. The shape of the labels matrix is (batch_size * num_patches, window_size * window_size)
     """
 
     data_matrix_bicubic = util.bicubic_interpolation(data_matrix)
 
     label_residual = label_matrix - data_matrix_bicubic
 
-    # Create smaller patches (20x20) from the (100x100) array
-    n = data_matrix.shape[0]
+    batch_size = data_matrix_bicubic.shape[0]
+
+    num_rows = int(data_matrix_bicubic.shape[2] / window_size)
+    num_cols = int(data_matrix_bicubic.shape[3] / window_size)
+
+    num_patches = num_rows * num_cols
 
     # Feature one: Original patch
-    X_ua_upsampled = np.zeros((25 * n, 20 * 20))
-    X_va_upsampled = np.zeros((25 * n, 20 * 20))
+    X_ua_upsampled = np.zeros((num_patches * batch_size, window_size * window_size))
+    X_va_upsampled = np.zeros((num_patches * batch_size, window_size * window_size))
 
     # Feature two: First-order difference
-    X_ua_first_ord = np.zeros((25 * n, 20 * 20))
-    X_va_first_ord = np.zeros((25 * n, 20 * 20))
+    X_ua_first_ord = np.zeros((num_patches * batch_size, window_size * window_size))
+    X_va_first_ord = np.zeros((num_patches * batch_size, window_size * window_size))
 
     # Feature three: Second-order difference
-    X_ua_second_ord = np.zeros((25 * n, 20 * 20))
-    X_va_second_ord = np.zeros((25 * n, 20 * 20))
+    X_ua_second_ord = np.zeros((num_patches * batch_size, window_size * window_size))
+    X_va_second_ord = np.zeros((num_patches * batch_size, window_size * window_size))
 
     # Output: Recostruction residual
-    Y_ua = np.zeros((25 * n, 20 * 20))
-    Y_va = np.zeros((25 * n, 20 * 20))
+    Y_ua = np.zeros((num_patches * batch_size, window_size * window_size))
+    Y_va = np.zeros((num_patches * batch_size, window_size * window_size))
 
-    for i in range(n):
+    for i in range(batch_size):
         current_ua_subpatch = (
             data_matrix_bicubic[i, 0, :, :]
-            .reshape(5, 20, 5, 20)
+            .reshape(num_rows, window_size, num_cols, window_size)
             .swapaxes(1, 2)
-            .reshape(-1, 20, 20)
+            .reshape(-1, window_size, window_size)
         )
         current_va_subpatch = (
             data_matrix_bicubic[i, 1, :, :]
-            .reshape(5, 20, 5, 20)
+            .reshape(num_rows, window_size, num_cols, window_size)
             .swapaxes(1, 2)
-            .reshape(-1, 20, 20)
+            .reshape(-1, window_size, window_size)
         )
 
         current_ua_first_ord = ndimage.gaussian_filter(
@@ -76,40 +89,40 @@ def generate_features(data_matrix: np.ndarray, label_matrix: np.ndarray):
             current_va_subpatch, sigma=5, order=2, mode="nearest", axes=(1, 2)
         )
 
-        X_ua_upsampled[i * 25 : i * 25 + 25, :] = current_ua_subpatch.reshape(
-            -1, 20 * 20
+        X_ua_upsampled[i * num_patches : i * num_patches + num_patches, :] = (
+            current_ua_subpatch.reshape(-1, window_size * window_size)
         )
-        X_va_upsampled[i * 25 : i * 25 + 25, :] = current_va_subpatch.reshape(
-            -1, 20 * 20
-        )
-
-        X_ua_first_ord[i * 25 : i * 25 + 25, :] = current_ua_first_ord.reshape(
-            -1, 20 * 20
-        )
-        X_va_first_ord[i * 25 : i * 25 + 25, :] = current_va_first_ord.reshape(
-            -1, 20 * 20
+        X_va_upsampled[i * num_patches : i * num_patches + num_patches, :] = (
+            current_va_subpatch.reshape(-1, window_size * window_size)
         )
 
-        X_ua_second_ord[i * 25 : i * 25 + 25, :] = current_ua_second_ord.reshape(
-            -1, 20 * 20
+        X_ua_first_ord[i * num_patches : i * num_patches + num_patches, :] = (
+            current_ua_first_ord.reshape(-1, window_size * window_size)
         )
-        X_va_second_ord[i * 25 : i * 25 + 25, :] = current_va_second_ord.reshape(
-            -1, 20 * 20
+        X_va_first_ord[i * num_patches : i * num_patches + num_patches, :] = (
+            current_va_first_ord.reshape(-1, window_size * window_size)
         )
 
-        Y_ua[i * 25 : i * 25 + 25, :] = (
+        X_ua_second_ord[i * num_patches : i * num_patches + num_patches, :] = (
+            current_ua_second_ord.reshape(-1, window_size * window_size)
+        )
+        X_va_second_ord[i * num_patches : i * num_patches + num_patches, :] = (
+            current_va_second_ord.reshape(-1, window_size * window_size)
+        )
+
+        Y_ua[i * num_patches : i * num_patches + num_patches, :] = (
             label_residual[i, 0, :, :]
-            .reshape(5, 20, 5, 20)
+            .reshape(num_rows, window_size, num_cols, window_size)
             .swapaxes(1, 2)
-            .reshape(-1, 20, 20)
-            .reshape(-1, 20 * 20)
+            .reshape(-1, window_size, window_size)
+            .reshape(-1, window_size * window_size)
         )
-        Y_va[i * 25 : i * 25 + 25, :] = (
+        Y_va[i * num_patches : i * num_patches + num_patches, :] = (
             label_residual[i, 1, :, :]
-            .reshape(5, 20, 5, 20)
+            .reshape(num_rows, window_size, num_cols, window_size)
             .swapaxes(1, 2)
-            .reshape(-1, 20, 20)
-            .reshape(-1, 20 * 20)
+            .reshape(-1, window_size, window_size)
+            .reshape(-1, window_size * window_size)
         )
 
     X_ua = np.hstack((X_ua_upsampled, X_ua_first_ord, X_ua_second_ord))
@@ -123,27 +136,33 @@ def generate_block_features(block_matrix: np.ndarray):
     array which represents an overlapping blocks of a test sample.
 
     Args:
-        block_matrix (np.ndarray): array of shape (17, 17, 20, 20) where
-        the first two dimensions represent block indicies.
+        block_matrix (np.ndarray): array of shape (num_rows, num_cols, window_size, window_size).
 
     Returns:
-        np.ndarray: features matrix as an array of shape (289, 1200)
+        np.ndarray: features matrix as an array of shape (num_rows * num_cols, 1200)
     """
-    X_upsampled = block_matrix.reshape(-1, 20 * 20)
+    window_size = block_matrix.shape[2]
+
+    X_upsampled = block_matrix.reshape(-1, window_size * window_size)
 
     X_first_ord = ndimage.gaussian_filter(
         block_matrix, sigma=5, order=1, mode="nearest", axes=[2, 3]
-    ).reshape(-1, 20 * 20)
+    ).reshape(-1, window_size * window_size)
     X_second_ord = ndimage.gaussian_filter(
         block_matrix, sigma=5, order=2, mode="nearest", axes=[2, 3]
-    ).reshape(-1, 20 * 20)
+    ).reshape(-1, window_size * window_size)
 
     X = np.hstack((X_upsampled, X_first_ord, X_second_ord))
     return X
 
 
 def random_forest_super_resolution(
-    X: np.ndarray, Y: np.ndarray, save_path: str, rf_args: dict, name: str = "rfsr.pkl"
+    X: np.ndarray,
+    Y: np.ndarray,
+    save_path: str,
+    rf_args: dict,
+    pca_components: int,
+    name: str = "rfsr.pkl",
 ):
     """Trains a random forest model for super resolution.
 
@@ -152,16 +171,26 @@ def random_forest_super_resolution(
         Y (np.ndarray): Label matrix of shape (num_examples, num_outputs).
         save_path (str): Path of where the trained model is saved.
         rf_args (dict): Hyperparameters and arguments of the random forest model.
+        pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "rfsr.pkl".
     """
+    pca = PCA(n_components=pca_components)
+    X_d = pca.fit_transform(X)
+
     rf = RandomForestRegressor(**rf_args)
-    rf.fit(X, Y)
+    rf.fit(X_d, Y)
 
     joblib.dump(rf, os.path.join(save_path, name))
+    joblib.dump(pca, os.path.join(save_path, "pca_" + name))
 
 
 def linear_regression_super_resolution(
-    X: np.ndarray, Y: np.ndarray, save_path: str, lr_args: dict, name: str = "lr.pkl"
+    X: np.ndarray,
+    Y: np.ndarray,
+    save_path: str,
+    lr_args: dict,
+    pca_components: int,
+    name: str = "lr.pkl",
 ):
     """Trains a linear regression model for super resolution.
 
@@ -170,34 +199,53 @@ def linear_regression_super_resolution(
         Y (np.ndarray): Label matrix of shape (num_examples, num_outputs).
         save_path (str): Path of where the trained model is saved.
         lr_args (dict): Hyperparameters and arguments of the random forest model.
+        pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "lr.pkl".
     """
-    rf = Ridge(**lr_args)
-    rf.fit(X, Y)
+    pca = PCA(n_components=pca_components)
+    X_d = pca.fit_transform(X)
 
-    joblib.dump(rf, os.path.join(save_path, name))
+    lr = Ridge(**lr_args)
+    lr.fit(X_d, Y)
 
-def predict_block(data_matrix: np.ndarray, model):
+    joblib.dump(lr, os.path.join(save_path, name))
+    joblib.dump(pca, os.path.join(save_path, "pca_" + name))
+
+
+def predict_block(data_matrix: np.ndarray, model, pca):
     """Perform block-wise prediction of a given test example.
 
     Args:
-        data_matrix (np.ndarray): array of shape (17, 17, 20, 20).
+        data_matrix (np.ndarray): array of shape (num_rows, num_cols, window_size, window_size).
         model : prediction model (e.g., RandomForestRegressor).
 
     Returns:
-        np.ndarray: array of predictions of shape (17, 17, 20, 20).
+        np.ndarray: array of predictions of shape (num_rows, num_cols, window_size, window_size).
     """
+    num_rows, num_cols = data_matrix.shape[0], data_matrix.shape[1]
+    window_size = data_matrix.shape[2]
+
     X = generate_block_features(data_matrix)
 
-    model.verbose = False
-    R = model.predict(X)
+    X_d = pca.transform(X)
 
-    Y = X[:, :400] + R
-    Y = Y.reshape(17, 17, 20, 20, order="C")
+    model.verbose = False
+    R = model.predict(X_d)
+
+    Y = X[:, : window_size * window_size] + R
+    Y = Y.reshape(num_rows, num_cols, window_size, window_size, order="C")
     return Y
 
 
-def predict(data_matrix, model_path_ua, model_path_va):
+def predict(
+    data_matrix,
+    model_path_ua,
+    pca_path_ua,
+    model_path_va,
+    pca_path_va,
+    window_size,
+    stride,
+):
     """Performs predictions on a given dataset.
 
     Args:
@@ -210,7 +258,10 @@ def predict(data_matrix, model_path_ua, model_path_va):
     """
 
     model_ua = joblib.load(model_path_ua)
+    pca_ua = joblib.load(pca_path_ua)
+
     model_va = joblib.load(model_path_va)
+    pca_va = joblib.load(pca_path_va)
 
     n = data_matrix.shape[0]
     predictions = np.zeros((n, 2, 100, 100))
@@ -223,20 +274,20 @@ def predict(data_matrix, model_path_ua, model_path_va):
 
         for channel_idx in [0, 1]:
             current_example_blocks = view_as_windows(
-                current_example_bicubic[i, channel_idx, :, :], 20, 5
+                current_example_bicubic[i, channel_idx, :, :], window_size, stride
             )
 
             if channel_idx == 0:
                 current_example_blocks_predictions = predict_block(
-                    current_example_blocks, model_ua
+                    current_example_blocks, model_ua, pca_ua
                 )
             else:
                 current_example_blocks_predictions = predict_block(
-                    current_example_blocks, model_va
+                    current_example_blocks, model_va, pca_va
                 )
 
             current_example_reconstruct = util.reconstruct_blocks(
-                current_example_blocks_predictions
+                current_example_blocks_predictions, stride
             )
 
             predictions[i, channel_idx, :, :] = current_example_reconstruct
@@ -245,35 +296,37 @@ def predict(data_matrix, model_path_ua, model_path_va):
 
 
 if __name__ == "__main__":
-    # Train a basic random forest model
-    data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 50)
+    # Train a basic local regression models
+    window_size = 20
+    stride = 5
+    pca_components = 15
 
-    X, Y = generate_features(data_matrix, label_matrix)
+    data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 150)
+
+    X, Y = generate_features(data_matrix, label_matrix, window_size)
 
     rf_args = {
-        "n_estimators": 100,
-        "max_depth": 12,
+        "n_estimators": 1000,
+        "max_depth": 16,
         "min_samples_split": 200,
         "n_jobs": -1,
         "verbose": 1,
-        "oob_score": True,
+        "oob_score": False,
     }
 
-    lr_args = {
-        "alpha": 0.5,
-        "fit_intercept": True
-    }
-    
+    lr_args = {"alpha": 0.5, "fit_intercept": True}
+
     # Train a model for ua and va wind component
-    #random_forest_super_resolution(X[0], Y[0], "models/", rf_args, name="rfsr_ua.pkl")
-    #random_forest_super_resolution(X[1], Y[1], "models/", rf_args, name="rfsr_va.pkl")
-    
-    linear_regression_super_resolution(X[0], Y[0], "models/", lr_args, name="lr_ua.pkl")
-    linear_regression_super_resolution(X[1], Y[1], "models/", lr_args, name="lr_va.pkl")
+    random_forest_super_resolution(
+        X[0], Y[0], "models/", rf_args, pca_components, name="rfsr_ua.pkl"
+    )
+    random_forest_super_resolution(
+        X[1], Y[1], "models/", rf_args, pca_components, name="rfsr_va.pkl"
+    )
 
-    model_path_ua = "models/lr_ua.pkl"
-    model_path_va = "models/lr_va.pkl"
-
-    Y = predict(data_matrix, model_path_ua, model_path_va)
-    #print(Y.shape)
-    
+    linear_regression_super_resolution(
+        X[0], Y[0], "models/", lr_args, pca_components, name="lr_ua.pkl"
+    )
+    linear_regression_super_resolution(
+        X[1], Y[1], "models/", lr_args, pca_components, name="lr_va.pkl"
+    )
