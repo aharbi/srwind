@@ -10,6 +10,6 @@ wget -P "dataset/" "https://data.caltech.edu/records/czs3p-5ss80/files/test.zip"
 #unzip -q "dataset/val.zip" -d "dataset/"
 #unzip -q "dataset/test.zip" -d "dataset/"
 
-7z x "dataset/train.zip"
-7z x "dataset/val.zip"
-7z x "dataset/test.zip"
+7z x "dataset/train.zip" -o./dataset/
+7z x "dataset/val.zip" -o./dataset/
+7z x "dataset/test.zip" -o./dataset/
