@@ -133,7 +133,16 @@ def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
     return metrics_array
 
 
-def compute_metrics_llr(path: str, model_path_ua, model_path_va, save_path):
+def compute_metrics_llr(
+    path: str,
+    model_path_ua,
+    pca_path_ua,
+    model_path_va,
+    pca_path_va,
+    window_size,
+    stride,
+    save_path,
+):
 
     file_names = os.listdir(path)
     n = len(file_names)
@@ -145,7 +154,15 @@ def compute_metrics_llr(path: str, model_path_ua, model_path_va, save_path):
             os.path.join(path, file_name)
         )
 
-        prediction_lr = llr.predict(current_data_matrix, model_path_ua, model_path_va)
+        prediction_lr = llr.predict(
+            current_data_matrix,
+            model_path_ua,
+            pca_path_ua,
+            model_path_va,
+            pca_path_va,
+            window_size,
+            stride,
+        )
 
         metrics_array[i * 256 : i * 256 + 256, :, :] = compute_metrics(
             current_label_matrix, prediction_lr

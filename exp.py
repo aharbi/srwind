@@ -9,7 +9,14 @@ def exp_1():
     to bicubic interpolation on the validation.
     """
     metrics_array_rr = metrics.compute_metrics_llr(
-        "dataset/val/", "models/lr_ua.pkl", "models/lr_va.pkl", "results/rr_val_metrics"
+        "dataset/val/",
+        "models/lr_ua.pkl",
+        "models/pca_lr_ua.pkl",
+        "models/lr_va.pkl",
+        "models/pca_lr_va.pkl",
+        20,
+        5,
+        "results/lr_val_metrics",
     )
 
     metrics_array_bicubic = metrics.compute_metrics_bicubic(
