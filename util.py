@@ -143,33 +143,32 @@ def bicubic_interpolation(patches: np.ndarray):
     return upsampled_patches
 
 
-def reconstruct_blocks(blocks: np.ndarray):
+def reconstruct_blocks(blocks: np.ndarray, stride: int):
     """Reconstruct an overlapping block-wise array into a single
     array, where the overlapping segments are averaged.
 
     Args:
-        blocks (np.ndarray): array of shape (17, 17, 20, 20)
+        blocks (np.ndarray): array of shape (num_rows, num_cols, window_size, window_size)
+        stride (int): Stride of the rolling window used on the input blocks.
 
     Returns:
         np.ndarray: array of shape (100, 100)
     """
+    window_size = blocks.shape[2]
 
     reconstructed_matrix = np.zeros((100, 100), dtype=float)
     count_matrix = np.zeros((100, 100), dtype=float)
-
-    stride = 5
-    window_shape = 20
 
     for i in range(blocks.shape[0]):
         for j in range(blocks.shape[1]):
             block = blocks[i, j]
             reconstructed_matrix[
-                i * stride : i * stride + window_shape,
-                j * stride : j * stride + window_shape,
+                i * stride : i * stride + window_size,
+                j * stride : j * stride + window_size,
             ] += block
             count_matrix[
-                i * stride : i * stride + window_shape,
-                j * stride : j * stride + window_shape,
+                i * stride : i * stride + window_size,
+                j * stride : j * stride + window_size,
             ] += 1
 
     reconstructed_matrix /= count_matrix
