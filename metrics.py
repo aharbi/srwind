@@ -3,6 +3,8 @@ import numpy as np
 import util
 import llr
 
+from skimage.metrics import structural_similarity as ssim
+
 
 def peak_signal_to_noise_ratio(ref_patch: np.ndarray, HR_patch: np.ndarray):
     """Computes the peak signal-to-noise ratio between a reference high-resolution
@@ -66,7 +68,7 @@ def structural_similarity_index(ref_patch: np.ndarray, HR_patch: np.ndarray):
     Returns:
         float: The structural similarity index.
     """
-    return None
+    return ssim(ref_patch, HR_patch, data_range=1)
 
 
 def kinetic_energy_spectra(patch: np.ndarray):
@@ -110,6 +112,9 @@ def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
         mae_log_ua.append(
             mean_absolute_error(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
         )
+        ssim_log_ua.append(
+            structural_similarity_index(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
+        )
 
         psnr_log_va.append(
             peak_signal_to_noise_ratio(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
@@ -120,18 +125,21 @@ def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
         mae_log_va.append(
             mean_absolute_error(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
         )
+        ssim_log_va.append(
+            structural_similarity_index(ref_patches[i, 1, :, :], HR_patches[i, 1, :, :])
+        )
 
     metrics_array = np.zeros((n, 2, 4))
 
     metrics_array[:, 0, 0] = psnr_log_ua
     metrics_array[:, 0, 1] = mse_log_ua
     metrics_array[:, 0, 2] = mae_log_ua
-    # metrics_array[:, 0, 3] = ssim_log_ua
+    metrics_array[:, 0, 3] = ssim_log_ua
 
     metrics_array[:, 1, 0] = psnr_log_va
     metrics_array[:, 1, 1] = mse_log_va
     metrics_array[:, 1, 2] = mae_log_va
-    # metrics_array[:, 1, 3] = ssim_log_ua
+    metrics_array[:, 1, 3] = ssim_log_va
 
     return metrics_array
 
