@@ -7,6 +7,7 @@ from scipy import ndimage
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 
 from skimage.util.shape import view_as_windows
@@ -174,6 +175,11 @@ def random_forest_super_resolution(
         pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "rfsr.pkl".
     """
+    scaler = MinMaxScaler()
+    scaler.fit(X)
+
+    X = scaler.transform(X)
+
     pca = PCA(n_components=pca_components)
     X_d = pca.fit_transform(X)
 
@@ -182,6 +188,7 @@ def random_forest_super_resolution(
 
     joblib.dump(rf, os.path.join(save_path, name))
     joblib.dump(pca, os.path.join(save_path, "pca_" + name))
+    joblib.dump(pca, os.path.join(save_path, "scaler_" + name))
 
 
 def linear_regression_super_resolution(
@@ -202,6 +209,11 @@ def linear_regression_super_resolution(
         pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "lr.pkl".
     """
+    scaler = MinMaxScaler()
+    scaler.fit(X)
+
+    X = scaler.transform(X)
+
     pca = PCA(n_components=pca_components)
     X_d = pca.fit_transform(X)
 
@@ -210,6 +222,7 @@ def linear_regression_super_resolution(
 
     joblib.dump(lr, os.path.join(save_path, name))
     joblib.dump(pca, os.path.join(save_path, "pca_" + name))
+    joblib.dump(pca, os.path.join(save_path, "scaler_" + name))
 
 
 def predict_block(data_matrix: np.ndarray, model, pca):

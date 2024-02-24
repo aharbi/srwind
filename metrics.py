@@ -16,8 +16,11 @@ def peak_signal_to_noise_ratio(ref_patch: np.ndarray, HR_patch: np.ndarray):
         float: The peak signal-to-noise ratio (in dB)
     """
     rmse = 1 / 100 * np.linalg.norm(ref_patch.flatten() - HR_patch.flatten(), 2)
-    psnr = 20 * np.log10(np.max(ref_patch) / rmse)
-    return 100 if (np.isnan(psnr) or np.isinf(psnr)) else psnr
+    if rmse != 0:
+        psnr = 20 * np.log10(1 / rmse)
+        return psnr
+    else:
+        return float("inf")
 
 
 def mean_squared_error(ref_patch: np.ndarray, HR_patch: np.ndarray):

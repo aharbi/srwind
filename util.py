@@ -100,6 +100,16 @@ def extract_patches(raw_data: np.ndarray):
     ua_patches = ua.reshape(16, 100, 16, 100).swapaxes(1, 2).reshape(-1, 100, 100)
     va_patches = va.reshape(16, 100, 16, 100).swapaxes(1, 2).reshape(-1, 100, 100)
 
+    ua_patches = (ua_patches.swapaxes(0, -1) - ua_patches.min(axis=(1, 2))) / (
+        ua_patches.max(axis=(1, 2)) - ua_patches.min(axis=(1, 2))
+    )
+    va_patches = (va_patches.swapaxes(0, -1) - va_patches.min(axis=(1, 2))) / (
+        va_patches.max(axis=(1, 2)) - va_patches.min(axis=(1, 2))
+    )
+
+    ua_patches = ua_patches.swapaxes(0, -1)
+    va_patches = va_patches.swapaxes(0, -1)
+
     return ua_patches, va_patches
 
 
