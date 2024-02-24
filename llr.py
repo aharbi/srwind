@@ -225,7 +225,7 @@ def linear_regression_super_resolution(
     joblib.dump(pca, os.path.join(save_path, "scaler_" + name))
 
 
-def predict_block(data_matrix: np.ndarray, model, pca):
+def predict_block(data_matrix: np.ndarray, model, pca, scaler):
     """Perform block-wise prediction of a given test example.
 
     Args:
@@ -239,7 +239,8 @@ def predict_block(data_matrix: np.ndarray, model, pca):
     window_size = data_matrix.shape[2]
 
     X = generate_block_features(data_matrix)
-
+    X = scaler.transform(X)
+    
     X_d = pca.transform(X)
 
     model.verbose = False
@@ -254,8 +255,10 @@ def predict(
     data_matrix,
     model_path_ua,
     pca_path_ua,
+    scaler_path_ua,
     model_path_va,
     pca_path_va,
+    scaler_path_va,
     window_size,
     stride,
 ):
@@ -272,9 +275,11 @@ def predict(
 
     model_ua = joblib.load(model_path_ua)
     pca_ua = joblib.load(pca_path_ua)
+    scaler_ua = joblib.load(scaler_path_ua)
 
     model_va = joblib.load(model_path_va)
     pca_va = joblib.load(pca_path_va)
+    scaler_va = joblib.load(scaler_path_va)
 
     n = data_matrix.shape[0]
     predictions = np.zeros((n, 2, 100, 100))
@@ -292,11 +297,11 @@ def predict(
 
             if channel_idx == 0:
                 current_example_blocks_predictions = predict_block(
-                    current_example_blocks, model_ua, pca_ua
+                    current_example_blocks, model_ua, pca_ua, scaler_ua
                 )
             else:
                 current_example_blocks_predictions = predict_block(
-                    current_example_blocks, model_va, pca_va
+                    current_example_blocks, model_va, pca_va, scaler_va
                 )
 
             current_example_reconstruct = util.reconstruct_blocks(
