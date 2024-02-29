@@ -33,10 +33,10 @@ def create_subsampled_dataset(path: str, sample_size: int = None):
     for index, file in enumerate(file_names_samples):
         raw_data = np.load(os.path.join(path, file))
 
-        ua_patches, uv_patches = extract_patches(raw_data)
+        ua_patches, va_patches = extract_patches(raw_data)
 
         ua_patches_downsampled = downsample(ua_patches)
-        va_patches_downsampled = downsample(uv_patches)
+        va_patches_downsampled = downsample(va_patches)
 
         data_matrix[(index * 256) : (index * 256 + 256), 0, :, :] = (
             ua_patches_downsampled
@@ -46,7 +46,7 @@ def create_subsampled_dataset(path: str, sample_size: int = None):
         )
 
         label_matrix[(index * 256) : (index * 256 + 256), 0, :, :] = ua_patches
-        label_matrix[(index * 256) : (index * 256 + 256), 1, :, :] = uv_patches
+        label_matrix[(index * 256) : (index * 256 + 256), 1, :, :] = va_patches
 
     return data_matrix, label_matrix
 
@@ -68,16 +68,56 @@ def create_single_file_dataset(path: str):
 
     raw_data = np.load(path)
 
-    ua_patches, uv_patches = extract_patches(raw_data)
+    ua_patches, va_patches = extract_patches(raw_data)
 
     ua_patches_downsampled = downsample(ua_patches)
-    va_patches_downsampled = downsample(uv_patches)
+    va_patches_downsampled = downsample(va_patches)
 
     data_matrix[:, 0, :, :] = ua_patches_downsampled
     data_matrix[:, 1, :, :] = va_patches_downsampled
 
     label_matrix[:, 0, :, :] = ua_patches
-    label_matrix[:, 1, :, :] = uv_patches
+    label_matrix[:, 1, :, :] = va_patches
+
+    return data_matrix, label_matrix
+
+
+def generate_random_dataset(dataset_path: str, save_path: str, size: int):
+
+    file_names = os.listdir(dataset_path)
+
+    data_matrix = np.zeros((size, 2, 20, 20))
+    label_matrix = np.zeros((size, 2, 100, 100))
+
+    for i in range(size):
+
+        current_file = random.choice(file_names)
+
+        raw_data = np.load(os.path.join(dataset_path, current_file))
+
+        idx_x = random.choice(range(1500))
+        idx_y = random.choice(range(1500))
+
+        ua_patch = raw_data[0, idx_x : (idx_x + 100), idx_y : (idx_y + 100)]
+        va_patch = raw_data[1, idx_x : (idx_x + 100), idx_y : (idx_y + 100)]
+
+        ua_patch = (ua_patch - ua_patch.min()) / (ua_patch.max() - ua_patch.min())
+        va_patch = (va_patch - va_patch.min()) / (va_patch.max() - va_patch.min())
+
+        ua_patch_downsampled = ua_patch[::5, ::5]
+        va_patch_downsampled = va_patch[::5, ::5]
+
+        data_matrix[i, 0, :, :] = ua_patch_downsampled
+        data_matrix[i, 1, :, :] = va_patch_downsampled
+
+        label_matrix[i, 0, :, :] = ua_patch
+        label_matrix[i, 1, :, :] = va_patch
+
+    with open(save_path + "data_matrix.npy", "wb") as f:
+        np.save(f, data_matrix)
+
+    with open(save_path + "label_matrix.npy", "wb") as f:
+        np.save(f, label_matrix)
 
     return data_matrix, label_matrix
 
