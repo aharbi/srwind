@@ -188,7 +188,7 @@ def random_forest_super_resolution(
 
     joblib.dump(rf, os.path.join(save_path, name))
     joblib.dump(pca, os.path.join(save_path, "pca_" + name))
-    joblib.dump(pca, os.path.join(save_path, "scaler_" + name))
+    joblib.dump(scaler, os.path.join(save_path, "scaler_" + name))
 
 
 def linear_regression_super_resolution(
@@ -222,7 +222,7 @@ def linear_regression_super_resolution(
 
     joblib.dump(lr, os.path.join(save_path, name))
     joblib.dump(pca, os.path.join(save_path, "pca_" + name))
-    joblib.dump(pca, os.path.join(save_path, "scaler_" + name))
+    joblib.dump(scaler, os.path.join(save_path, "scaler_" + name))
 
 
 def predict_block(data_matrix: np.ndarray, model, pca, scaler):
@@ -311,40 +311,3 @@ def predict(
             predictions[i, channel_idx, :, :] = current_example_reconstruct
 
     return predictions
-
-
-if __name__ == "__main__":
-    # Train a basic local regression models
-    window_size = 20
-    stride = 5
-    pca_components = 15
-
-    data_matrix, label_matrix = util.create_subsampled_dataset("dataset/train/", 150)
-
-    X, Y = generate_features(data_matrix, label_matrix, window_size)
-
-    rf_args = {
-        "n_estimators": 1000,
-        "max_depth": 16,
-        "min_samples_split": 200,
-        "n_jobs": -1,
-        "verbose": 1,
-        "oob_score": False,
-    }
-
-    lr_args = {"alpha": 0.5, "fit_intercept": True}
-
-    # Train a model for ua and va wind component
-    random_forest_super_resolution(
-        X[0], Y[0], "models/", rf_args, pca_components, name="rfsr_ua.pkl"
-    )
-    random_forest_super_resolution(
-        X[1], Y[1], "models/", rf_args, pca_components, name="rfsr_va.pkl"
-    )
-
-    linear_regression_super_resolution(
-        X[0], Y[0], "models/", lr_args, pca_components, name="lr_ua.pkl"
-    )
-    linear_regression_super_resolution(
-        X[1], Y[1], "models/", lr_args, pca_components, name="lr_va.pkl"
-    )
