@@ -240,7 +240,7 @@ def predict_block(data_matrix: np.ndarray, model, pca, scaler):
 
     X = generate_block_features(data_matrix)
     X = scaler.transform(X)
-    
+
     X_d = pca.transform(X)
 
     model.verbose = False
@@ -248,6 +248,9 @@ def predict_block(data_matrix: np.ndarray, model, pca, scaler):
 
     Y = X[:, : window_size * window_size] + R
     Y = Y.reshape(num_rows, num_cols, window_size, window_size, order="C")
+
+    Y = np.clip(Y, 0, 1.0)
+
     return Y
 
 
