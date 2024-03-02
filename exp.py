@@ -57,7 +57,6 @@ def exp_2():
     rf_args = {
         "n_estimators": 1000,
         "max_depth": 16,
-        "min_samples_split": 200,
         "n_jobs": -1,
         "verbose": 1,
     }
@@ -66,9 +65,6 @@ def exp_2():
     if train:
         data_matrix = np.load("dataset/data_matrix.npy")
         label_matrix = np.load("dataset/label_matrix.npy")
-
-        data_matrix = data_matrix[:50, :, :, :]
-        label_matrix = label_matrix[:50, :, :, :]
 
         X, Y = llr.generate_features(data_matrix, label_matrix, window_size)
 
