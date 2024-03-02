@@ -148,8 +148,10 @@ def compute_metrics_llr(
     path: str,
     model_path_ua,
     pca_path_ua,
+    scaler_path_ua,
     model_path_va,
     pca_path_va,
+    scaler_path_va,
     window_size,
     stride,
     save_path,
@@ -166,13 +168,15 @@ def compute_metrics_llr(
         )
 
         prediction_lr = llr.predict(
-            current_data_matrix,
-            model_path_ua,
-            pca_path_ua,
-            model_path_va,
-            pca_path_va,
-            window_size,
-            stride,
+            data_matrix=current_data_matrix,
+            model_path_ua=model_path_ua,
+            pca_path_ua=pca_path_ua,
+            scaler_path_ua=scaler_path_ua,
+            model_path_va=model_path_va,
+            pca_path_va=pca_path_va,
+            scaler_path_va=scaler_path_va,
+            window_size=window_size,
+            stride=stride,
         )
 
         metrics_array[i * 256 : i * 256 + 256, :, :] = compute_metrics(
