@@ -104,16 +104,6 @@ def exp_2():
     mae_rr = np.vstack([metrics_array_rr[:, 0, 2], metrics_array_rr[:, 1, 2]])
     ssim_rr = np.vstack([metrics_array_rr[:, 0, 3], metrics_array_rr[:, 1, 3]])
 
-    print("RR - Average PSNR: ", np.ma.masked_invalid(psnr_rr).mean())
-    print("RR - Average MSE: ", mse_rr.mean())
-    print("RR - Average MAE: ", mae_rr.mean())
-    print("RR - Average SSIM: ", ssim_rr.mean())
-
-    print("RR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rr).std())
-    print("RR - Standard Deviation of MSE: ", mse_rr.std())
-    print("RR - Standard Deviation of MAE: ", mae_rr.std())
-    print("RR - Standard Deviation of SSIM: ", ssim_rr.std())
-
     # Randfom forest metrics
     metrics_array_rr = metrics.compute_metrics_llr(
         path="dataset/test_2/",
@@ -133,16 +123,6 @@ def exp_2():
     mae_rfsr = np.vstack([metrics_array_rr[:, 0, 2], metrics_array_rr[:, 1, 2]])
     ssim_rfsr = np.vstack([metrics_array_rr[:, 0, 3], metrics_array_rr[:, 1, 3]])
 
-    print("RFSR - Average PSNR: ", np.ma.masked_invalid(psnr_rfsr).mean())
-    print("RFSR - Average MSE: ", mse_rfsr.mean())
-    print("RFSR - Average MAE: ", mae_rfsr.mean())
-    print("RFSR - Average SSIM: ", ssim_rfsr.mean())
-
-    print("RFSR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rfsr).std())
-    print("RFSR - Standard Deviation of MSE: ", mse_rfsr.std())
-    print("RFSR - Standard Deviation of MAE: ", mae_rfsr.std())
-    print("RFSR - Standard Deviation of SSIM: ", ssim_rfsr.std())
-
     # Bicubic Interpolation metrics
     metrics_array_bicubic = metrics.compute_metrics_bicubic(
         "dataset/test_2/", "results/bicubic_test_metrics"
@@ -160,6 +140,26 @@ def exp_2():
     ssim_bicubic = np.vstack(
         [metrics_array_bicubic[:, 0, 3], metrics_array_bicubic[:, 1, 3]]
     )
+
+    print("RR - Average PSNR: ", np.ma.masked_invalid(psnr_rr).mean())
+    print("RR - Average MSE: ", mse_rr.mean())
+    print("RR - Average MAE: ", mae_rr.mean())
+    print("RR - Average SSIM: ", ssim_rr.mean())
+
+    print("RR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rr).std())
+    print("RR - Standard Deviation of MSE: ", mse_rr.std())
+    print("RR - Standard Deviation of MAE: ", mae_rr.std())
+    print("RR - Standard Deviation of SSIM: ", ssim_rr.std())
+
+    print("RFSR - Average PSNR: ", np.ma.masked_invalid(psnr_rfsr).mean())
+    print("RFSR - Average MSE: ", mse_rfsr.mean())
+    print("RFSR - Average MAE: ", mae_rfsr.mean())
+    print("RFSR - Average SSIM: ", ssim_rfsr.mean())
+
+    print("RFSR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rfsr).std())
+    print("RFSR - Standard Deviation of MSE: ", mse_rfsr.std())
+    print("RFSR - Standard Deviation of MAE: ", mae_rfsr.std())
+    print("RFSR - Standard Deviation of SSIM: ", ssim_rfsr.std())
 
     print("Bicubic - Average PSNR: ", np.ma.masked_invalid(psnr_bicubic).mean())
     print("Bicubic - Average MSE: ", mse_bicubic.mean())
