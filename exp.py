@@ -55,10 +55,10 @@ def exp_2():
     lr_args = {"alpha": 0.5, "fit_intercept": True}
 
     rf_args = {
-        "n_estimators": 500,
+        "n_estimators": 400,
         "max_depth": 16,
         "n_jobs": -1,
-        "verbose": 1,
+        "verbose": 2,
     }
 
     # Loading data

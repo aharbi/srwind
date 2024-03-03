@@ -175,9 +175,6 @@ def random_forest_super_resolution(
         pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "rfsr.pkl".
     """
-    X = X.astype(np.float32)
-    Y = Y.astype(np.float32)
-
     scaler = MinMaxScaler()
     scaler.fit(X)
 
@@ -212,9 +209,6 @@ def linear_regression_super_resolution(
         pca_components (int): Number of principle componenets to keep in PCA.
         name (str, optional): Name of the saved model. Defaults to "lr.pkl".
     """
-    X = X.astype(np.float32)
-    Y = Y.astype(np.float32)
-
     scaler = MinMaxScaler()
     scaler.fit(X)
 
@@ -245,7 +239,6 @@ def predict_block(data_matrix: np.ndarray, model, pca, scaler):
     window_size = data_matrix.shape[2]
 
     X = generate_block_features(data_matrix)
-    X = X.astype(np.float32)
 
     X = scaler.transform(X)
 
