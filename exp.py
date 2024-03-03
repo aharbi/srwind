@@ -87,7 +87,7 @@ def exp_2():
 
     # Ridge regression metrics
     metrics_array_rr = metrics.compute_metrics_llr(
-        path="dataset/test_2/",
+        path="dataset/test/",
         model_path_ua="models/lr_ua.pkl",
         pca_path_ua="models/pca_lr_ua.pkl",
         scaler_path_ua="models/scaler_lr_ua.pkl",
@@ -106,7 +106,7 @@ def exp_2():
 
     # Randfom forest metrics
     metrics_array_rr = metrics.compute_metrics_llr(
-        path="dataset/test_2/",
+        path="dataset/test/",
         model_path_ua="models/rfsr_ua.pkl",
         pca_path_ua="models/pca_rfsr_ua.pkl",
         scaler_path_ua="models/scaler_rfsr_ua.pkl",
@@ -125,7 +125,7 @@ def exp_2():
 
     # Bicubic Interpolation metrics
     metrics_array_bicubic = metrics.compute_metrics_bicubic(
-        "dataset/test_2/", "results/bicubic_test_metrics"
+        "dataset/test/", "results/bicubic_test_metrics"
     )
 
     psnr_bicubic = np.vstack(
