@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import util
+import dataset
 import llr
 
 from skimage.metrics import structural_similarity as ssim
@@ -163,7 +164,7 @@ def compute_metrics_llr(
     metrics_array = np.zeros((256 * n, 2, 4))
 
     for i, file_name in enumerate(file_names):
-        current_data_matrix, current_label_matrix = util.create_single_file_dataset(
+        current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
             os.path.join(path, file_name)
         )
 
@@ -199,7 +200,7 @@ def compute_metrics_bicubic(path: str, save_path):
     metrics_array = np.zeros((256 * n, 2, 4))
 
     for i, file_name in enumerate(file_names):
-        current_data_matrix, current_label_matrix = util.create_single_file_dataset(
+        current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
             os.path.join(path, file_name)
         )
 
