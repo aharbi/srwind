@@ -47,7 +47,7 @@ def exp_2():
     to bicubic interpolation on the testing set.
     """
     # Models parameters
-    window_size = 20
+    window_size = 10
     stride = 5
     pca_components = 16
     train = True
@@ -55,7 +55,7 @@ def exp_2():
     lr_args = {"alpha": 0.5, "fit_intercept": True}
 
     rf_args = {
-        "n_estimators": 400,
+        "n_estimators": 1000,
         "max_depth": 16,
         "n_jobs": -1,
         "verbose": 2,
@@ -167,11 +167,11 @@ def exp_2():
     print("Bicubic - Average SSIM: ", ssim_bicubic.mean())
 
     print(
-        "RFSR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_bicubic).std()
+        "Bicubic - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_bicubic).std()
     )
-    print("RFSR - Standard Deviation of MSE: ", mse_bicubic.std())
-    print("RFSR - Standard Deviation of MAE: ", mae_bicubic.std())
-    print("RFSR - Standard Deviation of SSIM: ", ssim_bicubic.std())
+    print("Bicubic - Standard Deviation of MSE: ", mse_bicubic.std())
+    print("Bicubic - Standard Deviation of MAE: ", mae_bicubic.std())
+    print("Bicubic - Standard Deviation of SSIM: ", ssim_bicubic.std())
 
 
 if __name__ == "__main__":
