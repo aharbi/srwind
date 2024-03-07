@@ -2,6 +2,7 @@ import os
 import random
 import util
 import numpy as np
+import torch
 
 from torch.utils.data import Dataset
 
@@ -25,8 +26,8 @@ class WindDataset(Dataset):
         LR_upsampled = util.bicubic_interpolation(LR)
         LR_upsampled = LR_upsampled[0, :, :, :]
 
-        LR_upsampled = LR_upsampled.swapaxes(0, 1).swapaxes(1, -1)
-        HR = HR.swapaxes(0, 1).swapaxes(1, -1)
+        LR_upsampled = torch.from_numpy(LR_upsampled.astype(np.float32))
+        HR = torch.from_numpy(HR.astype(np.float32))
 
         return LR_upsampled, HR
 
