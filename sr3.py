@@ -46,6 +46,8 @@ class RegressionSR3(nn.Module):
                 optim.zero_grad()
 
                 x = x.to(self.device)
+                y = y.to(self.device)
+
                 y_hat = self.model(x)
 
                 output = loss(y_hat, y)
@@ -165,7 +167,7 @@ class DiffusionSR3(nn.Module):
 
     def forward(self, x, y):
         # Only used for training!
-        t = torch.randint(1, self.T + 1, (y.shape[0],)).to(self.device)
+        t = torch.randint(1, self.T + 1, (y.shape[0],))
         noise = torch.randn_like(y)
 
         y_t = (
@@ -174,15 +176,16 @@ class DiffusionSR3(nn.Module):
         )
 
         x_y = torch.cat([x, y_t], dim=1)
+        x_y = x_y.to(self.device)
 
-        return self.model(x_y, t / self.T), noise
+        return self.model(x_y, (t / self.T).to(self.device)), noise
 
     def inference(self, x):
 
         y_t = torch.randn(x.shape)
 
         for i in range(self.T, 0, -1):
-            print(f"sampling timestep {i}", end="\r")
+            print("Sampling timestep {}".format(i), end="\r")
 
             t = torch.tensor([i / self.T]).to(self.device)
             t = t.repeat(x.shape[0], 1, 1, 1)

@@ -176,8 +176,8 @@ def exp_2():
 def exp_3():
     device = "cuda"
     num_features = 256
-    num_epochs = 30
-    batch_size = 64
+    num_epochs = 25
+    batch_size = 32
 
     regression_SR3 = sr3.RegressionSR3(
         device=device,
@@ -236,9 +236,9 @@ def exp_3():
 def exp_4():
     device = "cuda"
     num_features = 256
-    num_epochs = 30
-    batch_size = 64
-    T = 400
+    num_epochs = 25
+    batch_size = 32
+    T = 600
 
     diffusion_SR3 = sr3.DiffusionSR3(device=device, T=T, num_features=num_features)
 
