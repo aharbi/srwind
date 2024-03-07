@@ -195,12 +195,11 @@ def exp_3():
         batch_size=batch_size,
     )
 
-    metrics_array_regression_sr3 = metrics.compute_metrics_sr3(
+    metrics_array_regression_sr3 = metrics.compute_metrics_regression_sr3(
         "dataset/test/",
         "models/regression_sr3_{}.pth".format(num_epochs - 1),
-        diffusion=False,
         device=device,
-        num_features=num_features
+        num_features=num_features,
     )
 
     psnr_regression_sr3 = np.vstack(
@@ -253,13 +252,12 @@ def exp_4():
         batch_size=batch_size,
     )
 
-    metrics_array_diffusion_sr3 = metrics.compute_metrics_sr3(
+    metrics_array_diffusion_sr3 = metrics.compute_metrics_diffusion_sr3(
         "dataset/test/",
         "models/diffusion_sr3_{}.pth".format(num_epochs - 1),
-        diffusion=True,
         device=device,
         T=T,
-        num_features=num_features
+        num_features=num_features,
     )
 
     psnr_diffusion_sr3 = np.vstack(
@@ -293,4 +291,4 @@ def exp_4():
 
 
 if __name__ == "__main__":
-    exp_3()
+    exp_4()

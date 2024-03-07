@@ -190,28 +190,18 @@ def compute_metrics_llr(
     return metrics_array
 
 
-def compute_metrics_sr3(
+def compute_metrics_regression_sr3(
     path: str,
     model_path: str,
-    diffusion: bool,
     device: str = "cuda",
-    T: int = 500,
     num_features: int = 256,
 ):
 
-    if diffusion:
-        sr3_model = sr3.DiffusionSR3(
-            device=device,
-            T=T,
-            num_features=num_features,
-            model_path=model_path,
-        )
-    else:
-        sr3_model = sr3.RegressionSR3(
-            device=device,
-            num_features=num_features,
-            model_path=model_path,
-        )
+    sr3_model = sr3.RegressionSR3(
+        device=device,
+        num_features=num_features,
+        model_path=model_path,
+    )
 
     file_names = os.listdir(path)
     n = len(file_names)
@@ -235,6 +225,50 @@ def compute_metrics_sr3(
         )
 
         print("Current Iteration (SR3): {} / {}".format(i, n))
+
+    return metrics_array
+
+
+def compute_metrics_diffusion_sr3(
+    path: str,
+    model_path: str,
+    device: str = "cuda",
+    T: int = 500,
+    num_features: int = 256,
+):
+
+    sr3_model = sr3.DiffusionSR3(
+        device=device,
+        T=T,
+        num_features=num_features,
+        model_path=model_path,
+    )
+
+    file_names = os.listdir(path)
+    sample_size = 2
+
+    metrics_array = np.zeros((256 * sample_size, 2, 4))
+
+    for i, file_name in enumerate(file_names[:sample_size]):
+        current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
+            os.path.join(path, file_name)
+        )
+
+        current_data_matrix = util.bicubic_interpolation(current_data_matrix)
+        current_data_matrix = current_data_matrix.astype(np.float32)
+
+        for j in range(0, 256, 2):
+            x = torch.from_numpy(current_data_matrix[j : j + 2])
+
+            prediction_sr3 = sr3_model.inference(x).detach().numpy()
+
+            metrics_array[i * 256 + j : i * 256 + j + 2, :, :] = compute_metrics(
+                current_label_matrix[j : j + 2], prediction_sr3
+            )
+
+            print("Current Sub-iteration: {} / {}".format(j, 256))
+
+        print("Current Iteration (SR3): {} / {}".format(i, sample_size))
 
     return metrics_array
 
