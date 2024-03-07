@@ -25,7 +25,9 @@ class RegressionSR3(nn.Module):
         self.model.to(device=device)
 
         if not (model_path is None):
-            self.model.load_state_dict(torch.load(model_path))
+            self.model.load_state_dict(
+                torch.load(model_path, map_location=torch.device(self.device))
+            )
 
     def train(self, dataset, batch_size=64, num_epochs=30, lr=1e-4, save_path=None):
 
@@ -99,7 +101,9 @@ class DiffusionSR3(nn.Module):
             self.register_buffer(k, v)
 
         if not (model_path is None):
-            self.model.load_state_dict(torch.load(model_path))
+            self.model.load_state_dict(
+                torch.load(model_path, map_location=torch.device(self.device))
+            )
 
     def noise_schedule(self, beta1, beta2, T):
 
