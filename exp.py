@@ -1,6 +1,8 @@
 import numpy as np
 import util
+import dataset
 import llr
+import sr3
 import metrics
 
 
@@ -96,7 +98,6 @@ def exp_2():
         scaler_path_va="models/scaler_lr_va.pkl",
         window_size=window_size,
         stride=stride,
-        save_path="results/lr_test_metrics",
     )
 
     psnr_rr = np.vstack([metrics_array_rr[:, 0, 0], metrics_array_rr[:, 1, 0]])
@@ -115,7 +116,6 @@ def exp_2():
         scaler_path_va="models/scaler_rfsr_va.pkl",
         window_size=window_size,
         stride=stride,
-        save_path="results/rfsr_test_metrics",
     )
 
     psnr_rfsr = np.vstack([metrics_array_rr[:, 0, 0], metrics_array_rr[:, 1, 0]])
@@ -124,9 +124,7 @@ def exp_2():
     ssim_rfsr = np.vstack([metrics_array_rr[:, 0, 3], metrics_array_rr[:, 1, 3]])
 
     # Bicubic Interpolation metrics
-    metrics_array_bicubic = metrics.compute_metrics_bicubic(
-        "dataset/test/", "results/bicubic_test_metrics"
-    )
+    metrics_array_bicubic = metrics.compute_metrics_bicubic("dataset/test/")
 
     psnr_bicubic = np.vstack(
         [metrics_array_bicubic[:, 0, 0], metrics_array_bicubic[:, 1, 0]]
@@ -167,12 +165,132 @@ def exp_2():
     print("Bicubic - Average SSIM: ", ssim_bicubic.mean())
 
     print(
-        "Bicubic - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_bicubic).std()
+        "Bicubic - Standard Deviation of PSNR: ",
+        np.ma.masked_invalid(psnr_bicubic).std(),
     )
     print("Bicubic - Standard Deviation of MSE: ", mse_bicubic.std())
     print("Bicubic - Standard Deviation of MAE: ", mae_bicubic.std())
     print("Bicubic - Standard Deviation of SSIM: ", ssim_bicubic.std())
 
 
+def exp_3():
+    device = "cuda"
+    num_features = 256
+    num_epochs = 30
+    batch_size = 64
+
+    regression_SR3 = sr3.RegressionSR3(
+        device=device,
+        num_features=num_features,
+    )
+
+    wind_dataset = dataset.WindDataset(
+        "dataset/data_matrix.npy", "dataset/label_matrix.npy"
+    )
+
+    regression_SR3.train(
+        dataset=wind_dataset,
+        save_path="models/",
+        num_epochs=num_epochs,
+        batch_size=batch_size,
+    )
+
+    metrics_array_regression_sr3 = metrics.compute_metrics_sr3(
+        "dataset/test/",
+        "models/regression_sr3_{}.pth".format(num_epochs - 1),
+        diffusion=False,
+        device=device,
+        num_features=num_features
+    )
+
+    psnr_regression_sr3 = np.vstack(
+        [metrics_array_regression_sr3[:, 0, 0], metrics_array_regression_sr3[:, 1, 0]]
+    )
+    mse_regression_sr3 = np.vstack(
+        [metrics_array_regression_sr3[:, 0, 1], metrics_array_regression_sr3[:, 1, 1]]
+    )
+    mae_regression_sr3 = np.vstack(
+        [metrics_array_regression_sr3[:, 0, 2], metrics_array_regression_sr3[:, 1, 2]]
+    )
+    ssim_regression_sr3 = np.vstack(
+        [metrics_array_regression_sr3[:, 0, 3], metrics_array_regression_sr3[:, 1, 3]]
+    )
+
+    print(
+        "SR3 (Regression) - Average PSNR: ",
+        np.ma.masked_invalid(psnr_regression_sr3).mean(),
+    )
+    print("SR3 (Regression) - Average MSE: ", mse_regression_sr3.mean())
+    print("SR3 (Regression) - Average MAE: ", mae_regression_sr3.mean())
+    print("SR3 (Regression) - Average SSIM: ", ssim_regression_sr3.mean())
+
+    print(
+        "SR3 (Regression) - Standard Deviation of PSNR: ",
+        np.ma.masked_invalid(psnr_regression_sr3).std(),
+    )
+    print("SR3 (Regression) - Standard Deviation of MSE: ", mse_regression_sr3.std())
+    print("SR3 (Regression) - Standard Deviation of MAE: ", mae_regression_sr3.std())
+    print("SR3 (Regression) - Standard Deviation of SSIM: ", ssim_regression_sr3.std())
+
+
+def exp_4():
+    device = "cuda"
+    num_features = 256
+    num_epochs = 30
+    batch_size = 64
+    T = 400
+
+    diffusion_SR3 = sr3.DiffusionSR3(device=device, T=T, num_features=num_features)
+
+    wind_dataset = dataset.WindDataset(
+        "dataset/data_matrix.npy", "dataset/label_matrix.npy"
+    )
+
+    diffusion_SR3.train(
+        dataset=wind_dataset,
+        save_path="models/",
+        num_epochs=num_epochs,
+        batch_size=batch_size,
+    )
+
+    metrics_array_diffusion_sr3 = metrics.compute_metrics_sr3(
+        "dataset/test/",
+        "models/diffusion_sr3_{}.pth".format(num_epochs - 1),
+        diffusion=True,
+        device=device,
+        T=T,
+        num_features=num_features
+    )
+
+    psnr_diffusion_sr3 = np.vstack(
+        [metrics_array_diffusion_sr3[:, 0, 0], metrics_array_diffusion_sr3[:, 1, 0]]
+    )
+    mse_diffusion_sr3 = np.vstack(
+        [metrics_array_diffusion_sr3[:, 0, 1], metrics_array_diffusion_sr3[:, 1, 1]]
+    )
+    mae_diffusion_sr3 = np.vstack(
+        [metrics_array_diffusion_sr3[:, 0, 2], metrics_array_diffusion_sr3[:, 1, 2]]
+    )
+    ssim_diffusion_sr3 = np.vstack(
+        [metrics_array_diffusion_sr3[:, 0, 3], metrics_array_diffusion_sr3[:, 1, 3]]
+    )
+
+    print(
+        "SR3 (Diffusion) - Average PSNR: ",
+        np.ma.masked_invalid(psnr_diffusion_sr3).mean(),
+    )
+    print("SR3 (Diffusion) - Average MSE: ", mse_diffusion_sr3.mean())
+    print("SR3 (Diffusion) - Average MAE: ", mae_diffusion_sr3.mean())
+    print("SR3 (Diffusion) - Average SSIM: ", ssim_diffusion_sr3.mean())
+
+    print(
+        "SR3 (Diffusion) - Standard Deviation of PSNR: ",
+        np.ma.masked_invalid(psnr_diffusion_sr3).std(),
+    )
+    print("SR3 (Diffusion) - Standard Deviation of MSE: ", mse_diffusion_sr3.std())
+    print("SR3 (Diffusion) - Standard Deviation of MAE: ", mae_diffusion_sr3.std())
+    print("SR3 (Diffusion) - Standard Deviation of SSIM: ", ssim_diffusion_sr3.std())
+
+
 if __name__ == "__main__":
-    exp_2()
+    exp_3()

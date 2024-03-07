@@ -1,8 +1,10 @@
 import os
 import numpy as np
+import torch
 import util
 import dataset
 import llr
+import sr3
 
 from skimage.metrics import structural_similarity as ssim
 
@@ -155,7 +157,6 @@ def compute_metrics_llr(
     scaler_path_va,
     window_size,
     stride,
-    save_path,
 ):
 
     file_names = os.listdir(path)
@@ -186,13 +187,59 @@ def compute_metrics_llr(
 
         print("Current Iteration (LLR): {} / {}".format(i, n))
 
-    with open(save_path, "wb") as f:
-        np.save(f, metrics_array)
+    return metrics_array
+
+
+def compute_metrics_sr3(
+    path: str,
+    model_path: str,
+    diffusion: bool,
+    device: str = "cuda",
+    T: int = 500,
+    num_features: int = 256,
+):
+
+    if diffusion:
+        sr3_model = sr3.DiffusionSR3(
+            device=device,
+            T=T,
+            num_features=num_features,
+            model_path=model_path,
+        )
+    else:
+        sr3_model = sr3.RegressionSR3(
+            device=device,
+            num_features=num_features,
+            model_path=model_path,
+        )
+
+    file_names = os.listdir(path)
+    n = len(file_names)
+
+    metrics_array = np.zeros((256 * n, 2, 4))
+
+    for i, file_name in enumerate(file_names):
+        current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
+            os.path.join(path, file_name)
+        )
+
+        current_data_matrix = util.bicubic_interpolation(current_data_matrix)
+        current_data_matrix = current_data_matrix.astype(np.float32)
+
+        x = torch.from_numpy(current_data_matrix)
+
+        prediction_sr3 = sr3_model.inference(x).detach().numpy()
+
+        metrics_array[i * 256 : i * 256 + 256, :, :] = compute_metrics(
+            current_label_matrix, prediction_sr3
+        )
+
+        print("Current Iteration (SR3): {} / {}".format(i, n))
 
     return metrics_array
 
 
-def compute_metrics_bicubic(path: str, save_path):
+def compute_metrics_bicubic(path: str):
 
     file_names = os.listdir(path)
     n = len(file_names)
@@ -211,8 +258,5 @@ def compute_metrics_bicubic(path: str, save_path):
         )
 
         print("Current Iteration (Bicubic): {} / {}".format(i, n))
-
-    with open(save_path, "wb") as f:
-        np.save(f, metrics_array)
 
     return metrics_array
