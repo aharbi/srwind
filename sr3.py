@@ -71,8 +71,10 @@ class RegressionSR3(nn.Module):
                 )
 
     def inference(self, x):
-
+        
         self.model.eval()
+
+        x = x.to(self.device)
 
         return self.model(x)
 
@@ -186,7 +188,10 @@ class DiffusionSR3(nn.Module):
 
     def inference(self, x):
 
+        x = x.to(self.device)
+
         y_t = torch.randn(x.shape)
+        y_t = y_t.to(self.device)
 
         for i in range(self.T, 0, -1):
             print("Sampling timestep {}".format(i), end="\r")

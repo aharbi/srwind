@@ -107,7 +107,7 @@ def compute_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray):
     n = ref_patches.shape[0]
     for i in range(n):
         psnr_log_ua.append(
-            peak_signal_to_noise_ratio(ref_patches[i, 0, :, :], HR_patches[i, 1, :, :])
+            peak_signal_to_noise_ratio(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
         )
         mse_log_ua.append(
             mean_squared_error(ref_patches[i, 0, :, :], HR_patches[i, 0, :, :])
