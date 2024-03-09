@@ -188,6 +188,8 @@ class DiffusionSR3(nn.Module):
 
     def inference(self, x):
 
+        self.model.eval()
+
         x = x.to(self.device)
 
         y_t = torch.randn(x.shape)
