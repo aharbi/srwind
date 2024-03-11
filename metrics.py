@@ -27,6 +27,28 @@ def peak_signal_to_noise_ratio(ref_patch: np.ndarray, HR_patch: np.ndarray):
     else:
         return float("inf")
 
+def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
+    """Computes the cosine similarity error between reference patch and predicted HR_patch,
+      after averaging over the specified kernel.
+      
+    Args:
+        ref_patch (np.ndarray): reference high-res patch
+        HR_patch (np.ndarray): predicted high-res patch
+    
+    Returns:
+        float: value of cosine similarity.
+    """
+
+    def filterAvg(subArray):
+        # input: array of dimension n x d
+        # output: average over all elements in subArray
+                
+        aVec = np.flatten(subArray)
+        return np.mean(aVec)
+
+
+    # step 1: average over some indices and vectorize resulting arrays
+
 
 def mean_squared_error(ref_patch: np.ndarray, HR_patch: np.ndarray):
     """Computes the mean squared error between a reference high-resolution
