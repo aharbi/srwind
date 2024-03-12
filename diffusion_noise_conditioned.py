@@ -302,6 +302,7 @@ if __name__ == "__main__":
     num_epochs = 30
     batch_size = 64
     num_timesteps = 400
+    size_training = 100
 
     diffusion_model = Diffusion(device=device, num_features = num_features, channels = channels, num_timesteps=num_timesteps)
     diffusion_model.set_noise_schedule(start=1e-4, end=2e-2)
@@ -309,12 +310,12 @@ if __name__ == "__main__":
     # wind_dataset = dataset.WindDataset("dataset/data_matrix.npy", "dataset/label_matrix.npy")
     
     # To implement only on sub sample
-    path = "dataset/test"
+    path = "dataset/train"
     file_names = os.listdir(path)
    
-    current_data_matrix, current_label_matrix = dataset.generate_random_dataset(dataset_path= path, save_path="dataset/test/", size=10)
+    current_data_matrix, current_label_matrix = dataset.generate_random_dataset(dataset_path= path, save_path="dataset/train/", size=size_training)
 
-    wind_dataset = dataset.WindDataset(data_matrix_path="dataset/test/data_matrix.npy", label_matrix_path="dataset/test/label_matrix.npy")
+    wind_dataset = dataset.WindDataset(data_matrix_path="dataset/train/data_matrix.npy", label_matrix_path="dataset/train/label_matrix.npy")
 
     diffusion_model.train(
         dataset=wind_dataset,
