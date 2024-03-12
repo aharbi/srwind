@@ -163,6 +163,8 @@ class Diffusion(nn.Module):
         # Initialize the UNet network
         self.model = UNet(in_channels=channels, num_features=num_features, embedding=True).to(device=self.device) 
 
+        self.set_noise_schedule(start=1e-4, end=2e-2)
+
         if not (model_path is None):
             self.model.load_state_dict(torch.load(model_path, map_location=torch.device(self.device)))
         
@@ -305,7 +307,6 @@ if __name__ == "__main__":
     size_training = 100
 
     diffusion_model = Diffusion(device=device, num_features = num_features, channels = channels, num_timesteps=num_timesteps)
-    diffusion_model.set_noise_schedule(start=1e-4, end=2e-2)
 
     # wind_dataset = dataset.WindDataset("dataset/data_matrix.npy", "dataset/label_matrix.npy")
     
