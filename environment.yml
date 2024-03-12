@@ -123,4 +123,4 @@ dependencies:
   - zfp=1.0.1=h295e98d_0
   - zlib-ng=2.0.7=hb7f2c08_0
   - zstd=1.5.5=h829000d_0
-prefix: /Users/abdulazizalharbi/miniconda3/envs/srwind
+# prefix: /Users/abdulazizalharbi/miniconda3/envs/srwind

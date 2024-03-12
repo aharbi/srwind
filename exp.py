@@ -65,29 +65,35 @@ def exp_2():
 
     # Loading data
     if train:
+        print("Starting training...")
         data_matrix = np.load("dataset/data_matrix.npy")
         label_matrix = np.load("dataset/label_matrix.npy")
 
         X, Y = llr.generate_features(data_matrix, label_matrix, window_size)
 
         # Training models
+        print("  linear_regression_super_resolution, x-component")
         llr.linear_regression_super_resolution(
             X[0], Y[0], "models/", lr_args, pca_components, name="lr_ua.pkl"
         )
 
+        print("  linear_regression_super_resolution, y-component")
         llr.linear_regression_super_resolution(
             X[1], Y[1], "models/", lr_args, pca_components, name="lr_va.pkl"
         )
 
         # Train random forest
+        print("  random_forest_super_resolution, x-component")
         llr.random_forest_super_resolution(
             X[0], Y[0], "models/", rf_args, pca_components, name="rfsr_ua.pkl"
         )
+        print("  random_forest_super_resolution, y-component")
         llr.random_forest_super_resolution(
             X[1], Y[1], "models/", rf_args, pca_components, name="rfsr_va.pkl"
         )
 
     # Ridge regression metrics
+    print("Computing metrics...")
     metrics_array_rr = metrics.compute_metrics_llr(
         path="dataset/test/",
         model_path_ua="models/lr_ua.pkl",
@@ -138,7 +144,7 @@ def exp_2():
     ssim_bicubic = np.vstack(
         [metrics_array_bicubic[:, 0, 3], metrics_array_bicubic[:, 1, 3]]
     )
-
+    print("----------------------------------------------")
     print("RR - Average PSNR: ", np.ma.masked_invalid(psnr_rr).mean())
     print("RR - Average MSE: ", mse_rr.mean())
     print("RR - Average MAE: ", mae_rr.mean())
@@ -291,4 +297,4 @@ def exp_4():
 
 
 if __name__ == "__main__":
-    exp_4()
+    exp_2()

@@ -161,3 +161,5 @@ cython_debug/
 
 # Dataset
 /dataset
+/figures
+/models
