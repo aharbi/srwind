@@ -88,28 +88,28 @@ def kinetic_energy_spectra(
 
         # wind_profile = prediction_bi[i,:,:]
         # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ground Truth']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ground Truth']['y'].append(HR_ek)
+        # Energy_Spectrum['Bicubic']['x'].append(HR_kvals2)
+        # Energy_Spectrum['Bicubic']['y'].append(HR_ek)
 
         # wind_profile = prediction_rr[i,:,:]
         # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ground Truth']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ground Truth']['y'].append(HR_ek)
+        # Energy_Spectrum['Ridge Regression']['x'].append(HR_kvals2)
+        # Energy_Spectrum['Ridge Regression']['y'].append(HR_ek)
 
         # wind_profile = prediction_rf[i,:,:]
         # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ground Truth']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ground Truth']['y'].append(HR_ek)
+        # Energy_Spectrum['Random Forest']['x'].append(HR_kvals2)
+        # Energy_Spectrum['Random Forest']['y'].append(HR_ek)
 
         # wind_profile = prediction_diff_sr3[i,:,:]
         # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ground Truth']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ground Truth']['y'].append(HR_ek)
+        # Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2)
+        # Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek)
 
         # wind_profile = prediction_reg_sr3[i,:,:]
         # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ground Truth']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ground Truth']['y'].append(HR_ek)
+        # Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2)
+        # Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek)
 
     plot_energy_spectra()
 
