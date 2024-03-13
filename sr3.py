@@ -185,7 +185,8 @@ class DiffusionSR3(nn.Module):
         x_y = x_y.to(self.device)
 
         return self.model(x_y, (t / self.T).to(self.device)), noise
-
+    
+    @torch.no_grad()
     def inference(self, x):
 
         self.model.eval()
