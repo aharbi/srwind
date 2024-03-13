@@ -89,12 +89,12 @@ def kinetic_energy_spectra(
             Energy_Spectrum['Random Forest']['x'].append(HR_kvals2)
             Energy_Spectrum['Random Forest']['y'].append(HR_ek)
     
-            wind_profile = prediction_diff_sr3[i,:,:]
+            wind_profile = prediction_reg_sr3[i,:,:]
             HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
             Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2)
             Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek)
     
-            wind_profile = prediction_reg_sr3[i,:,:]
+            wind_profile = prediction_diff_sr3[i,:,:]
             HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
             Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2)
             Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek)
@@ -121,7 +121,7 @@ def plot_energy_spectra():
 
 if __name__ == "__main__":
 
-    num_images = 20 
+    num_images = 100
     for i in range(num_images):
         current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.plot_random_result()
 
