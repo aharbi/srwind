@@ -227,7 +227,7 @@ def plot_random_result():
     fig.savefig("figures/results_sample.png")
     plt.show()
 
-    return current_data_matrix, current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3
+    return current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3
 
 # plot_random_sample("dataset/val/")
 # plot_random_result()
