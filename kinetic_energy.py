@@ -9,20 +9,30 @@ import random
 from PIL import Image
 
 import dataset
+import visualization 
 
 """
 This code is adpated from the implementation in:
 https://github.com/RupaKurinchiVendhan/WiSoSuper/blob/main/energy.py
 """
 
+Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
+                       'LR':  {'x':[], 'y':[]}, 
+                        'Bicubic':  {'x':[], 'y':[]}, 
+                        'Ridge Regression':  {'x':[], 'y':[]}, 
+                        'Random Forest':  {'x':[], 'y':[]}, 
+                        'SR3 (Regression)':  {'x':[], 'y':[]}, 
+                        'SR3 (Diffusion)':  {'x':[], 'y':[]}
+                       }
+
 def kinetic_energy_spectra(
         current_data_matrix, 
         current_label_matrix, 
-        # prediction_bi, 
-        # prediction_rr, 
-        # prediction_rf, 
-        # prediction_reg_sr3,
-        # prediction_diff_sr3
+        prediction_bi, 
+        prediction_rr, 
+        prediction_rf, 
+        prediction_reg_sr3,
+        prediction_diff_sr3
     ):
     
     def energy_spectrum(img):
@@ -51,84 +61,79 @@ def kinetic_energy_spectra(
 
         return kvals, Abins
 
-    def plot_energy_spectra():
-        colors = {'HR': 'black', 'LR': 'pink', 
-                  #'Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'
-                  }
-        for model in Energy_Spectrum:
-            k = np.flip(np.mean(Energy_Spectrum[model]['x'], axis=0))
-            E = np.mean(Energy_Spectrum[model]['y'], axis=0) / 10000
-            plt.loglog(k, E, color=colors[model], label=model)
-        plt.xlabel("k (wavenumber)")
-        plt.ylabel("Kinetic Energy")
-        plt.tight_layout()
-        plt.title("Energy Spectrum")
-        plt.legend()
-        plt.savefig("wind_spectrum.png", dpi=1000, transparent=True, bbox_inches='tight')
-        plt.show()
 
-    Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
-                       'LR':  {'x':[], 'y':[]}, 
-                    #    'Bicubic':  {'x':[], 'y':[]}, 
-                    #    'Ridge Regression':  {'x':[], 'y':[]}, 
-                    #    'Random Forest':  {'x':[], 'y':[]}, 
-                    #    'SR3 (Regression)':  {'x':[], 'y':[]}, 
-                    #    'SR3 (Diffusion)':  {'x':[], 'y':[]}
-                       }
-    for i in range(2):
-        wind_profile = current_label_matrix[0,i,:,:]
-        HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        Energy_Spectrum['HR']['x'].append(HR_kvals2)
-        Energy_Spectrum['HR']['y'].append(HR_ek)
+    def compare_outputs():
+        for i in range(2):
+            wind_profile = current_label_matrix[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['HR']['x'].append(HR_kvals2)
+            Energy_Spectrum['HR']['y'].append(HR_ek)
+    
+            wind_profile = current_data_matrix[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['LR']['x'].append(HR_kvals2)
+            Energy_Spectrum['LR']['y'].append(HR_ek)
+    
+            wind_profile = prediction_bi[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['Bicubic']['x'].append(HR_kvals2)
+            Energy_Spectrum['Bicubic']['y'].append(HR_ek)
+    
+            wind_profile = prediction_rr[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['Ridge Regression']['x'].append(HR_kvals2)
+            Energy_Spectrum['Ridge Regression']['y'].append(HR_ek)
+    
+            wind_profile = prediction_rf[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['Random Forest']['x'].append(HR_kvals2)
+            Energy_Spectrum['Random Forest']['y'].append(HR_ek)
+    
+            wind_profile = prediction_diff_sr3[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2)
+            Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek)
+    
+            wind_profile = prediction_reg_sr3[i,:,:]
+            HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
+            Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2)
+            Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek)
 
-        wind_profile = current_data_matrix[0,i,:,:]
-        HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        Energy_Spectrum['LR']['x'].append(HR_kvals2)
-        Energy_Spectrum['LR']['y'].append(HR_ek)
+    compare_outputs()
 
-        # wind_profile = prediction_bi[i,:,:]
-        # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Bicubic']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Bicubic']['y'].append(HR_ek)
-
-        # wind_profile = prediction_rr[i,:,:]
-        # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Ridge Regression']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Ridge Regression']['y'].append(HR_ek)
-
-        # wind_profile = prediction_rf[i,:,:]
-        # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['Random Forest']['x'].append(HR_kvals2)
-        # Energy_Spectrum['Random Forest']['y'].append(HR_ek)
-
-        # wind_profile = prediction_diff_sr3[i,:,:]
-        # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2)
-        # Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek)
-
-        # wind_profile = prediction_reg_sr3[i,:,:]
-        # HR_kvals2, HR_ek = energy_spectrum(Image.fromarray(wind_profile.astype('uint8')))
-        # Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2)
-        # Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek)
-
-    plot_energy_spectra()
+def plot_energy_spectra():
+    colors = {'HR': 'black', 'LR': 'pink', 
+              'Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'
+              }
+    
+    for model in Energy_Spectrum:
+        k = np.flip(np.mean(Energy_Spectrum[model]['x'], axis=0))
+        E = np.mean(Energy_Spectrum[model]['y'], axis=0) / 10000
+        plt.loglog(k, E, color=colors[model], label=model)
+    plt.xlabel("k (wavenumber)")
+    plt.ylabel("Kinetic Energy")
+    plt.tight_layout()
+    plt.title("Energy Spectrum")
+    plt.legend()
+    plt.savefig("wind_spectrum.png", dpi=1000, transparent=True, bbox_inches='tight')
+    plt.show()
 
 
 if __name__ == "__main__":
-    path = "dataset/test/"
 
-    file_names = os.listdir(path)
-    file_name = random.choice(file_names)
-    i = random.choice(range(256))
+    num_images = 20 
+    for i in range(num_images):
+        current_data_matrix, current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.plot_random_result()
 
-    current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
-        os.path.join(path, file_name)
-    )
-
-    current_data_matrix = current_data_matrix[i : i + 1]
-    current_label_matrix = current_label_matrix[i : i + 1]
-
-    kinetic_energy_spectra(
-            current_data_matrix, 
-            current_label_matrix,
+        plt.figure()
+        kinetic_energy_spectra(
+            current_data_matrix[0,:,:,:], 
+            current_label_matrix[0,:,:,:], 
+            prediction_bi[0,:,:,:], 
+            prediction_rr[0,:,:,:], 
+            prediction_rf[0,:,:,:], 
+            prediction_reg_sr3[0,:,:,:],
+            prediction_diff_sr3[0,:,:,:]
         )
+        
+    plot_energy_spectra()
