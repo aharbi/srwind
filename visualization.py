@@ -272,13 +272,13 @@ def compute_random_result():
     window_size = 10
     stride = 5
 
-    model_path_ua_rf = "models/lr_ua_10.pkl"
-    pca_path_ua_rf = "models/pca_lr_ua_10.pkl"
-    scaler_path_ua_rf = "models/scaler_lr_ua_10.pkl"
+    model_path_ua_rf = "models/rfsr_ua_10.pkl"
+    pca_path_ua_rf = "models/pca_rfsr_ua_10.pkl"
+    scaler_path_ua_rf = "models/scaler_rfsr_ua_10.pkl"
 
-    model_path_va_rf = "models/lr_va_10.pkl"
-    pca_path_va_rf = "models/pca_lr_va_10.pkl"
-    scaler_path_va_rf = "models/scaler_lr_va_10.pkl"
+    model_path_va_rf = "models/rfsr_va_10.pkl"
+    pca_path_va_rf = "models/pca_rfsr_va_10.pkl"
+    scaler_path_va_rf = "models/scaler_rfsr_va_10.pkl"
 
     prediction_rf = llr.predict(
         data_matrix=current_data_matrix,
