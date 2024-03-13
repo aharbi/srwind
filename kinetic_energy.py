@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     num_images = 20 
     for i in range(num_images):
-        current_data_matrix, current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.plot_random_result()
+        current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.plot_random_result()
 
         plt.figure()
         kinetic_energy_spectra(
