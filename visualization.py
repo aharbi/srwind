@@ -8,7 +8,6 @@ import util
 import llr
 import sr3
 
-
 def plot_random_sample(path: str):
     """Plots a random sample from the NREL Wind Toolkit dataset. The plot
     shows both westward (ua) and southward (va) wind componenets along with
@@ -70,7 +69,7 @@ def plot_random_result():
     # Bicubic Interpolation
     prediction_bi = util.bicubic_interpolation(current_data_matrix)
 
-    # Ridge regression
+    # # Ridge regression
     window_size = 10
     stride = 5
 
@@ -135,7 +134,7 @@ def plot_random_result():
     x = torch.from_numpy(current_data_matrix_sr3)
 
     prediction_reg_sr3 = sr3_model.inference(x).detach().numpy()
-
+    
     # SR3 (Diffusion)
     device = "cuda"
     num_features = 256
@@ -184,7 +183,7 @@ def plot_random_result():
     axs[1, 2].set_xticks([])
     axs[1, 2].set_yticks([])
 
-    # Ridge Regression
+    # # Ridge Regression
     axs[0, 3].set_title("Ridge Regression")
     axs[0, 3].imshow(prediction_rr[0, 0, :, :])
     axs[0, 3].set_xticks([])
@@ -194,7 +193,7 @@ def plot_random_result():
     axs[1, 3].set_xticks([])
     axs[1, 3].set_yticks([])
 
-    # Random Forest
+    # # Random Forest
     axs[0, 4].set_title("Random Forest")
     axs[0, 4].imshow(prediction_rf[0, 0, :, :])
     axs[0, 4].set_xticks([])
@@ -204,7 +203,7 @@ def plot_random_result():
     axs[1, 4].set_xticks([])
     axs[1, 4].set_yticks([])
 
-    # SR3 (Regression)
+    # # SR3 (Regression)
     axs[0, 5].set_title("SR3 (Regression)")
     axs[0, 5].imshow(prediction_reg_sr3[0, 0, :, :])
     axs[0, 5].set_xticks([])
@@ -227,7 +226,106 @@ def plot_random_result():
     fig.savefig("figures/results_sample.png")
     plt.show()
 
+
+def compute_random_result():
+    path = "dataset/test/"
+
+    file_names = os.listdir(path)
+    file_name = random.choice(file_names)
+    i = random.choice(range(256))
+
+    current_data_matrix, current_label_matrix = dataset.create_single_file_dataset(
+        os.path.join(path, file_name)
+    )
+
+    current_data_matrix = current_data_matrix[i : i + 1]
+    current_label_matrix = current_label_matrix[i : i + 1]
+
+    # Bicubic Interpolation
+    prediction_bi = util.bicubic_interpolation(current_data_matrix)
+
+    # # Ridge regression
+    window_size = 10
+    stride = 5
+
+    model_path_ua_rr = "models/lr_ua_10.pkl"
+    pca_path_ua_rr = "models/pca_lr_ua_10.pkl"
+    scaler_path_ua_rr = "models/scaler_lr_ua_10.pkl"
+
+    model_path_va_rr = "models/lr_va_10.pkl"
+    pca_path_va_rr = "models/pca_lr_va_10.pkl"
+    scaler_path_va_rr = "models/scaler_lr_va_10.pkl"
+
+    prediction_rr = llr.predict(
+        data_matrix=current_data_matrix,
+        model_path_ua=model_path_ua_rr,
+        pca_path_ua=pca_path_ua_rr,
+        scaler_path_ua=scaler_path_ua_rr,
+        model_path_va=model_path_va_rr,
+        pca_path_va=pca_path_va_rr,
+        scaler_path_va=scaler_path_va_rr,
+        window_size=window_size,
+        stride=stride,
+    )
+
+    # Random Forest
+    window_size = 10
+    stride = 5
+
+    model_path_ua_rf = "models/lr_ua_10.pkl"
+    pca_path_ua_rf = "models/pca_lr_ua_10.pkl"
+    scaler_path_ua_rf = "models/scaler_lr_ua_10.pkl"
+
+    model_path_va_rf = "models/lr_va_10.pkl"
+    pca_path_va_rf = "models/pca_lr_va_10.pkl"
+    scaler_path_va_rf = "models/scaler_lr_va_10.pkl"
+
+    prediction_rf = llr.predict(
+        data_matrix=current_data_matrix,
+        model_path_ua=model_path_ua_rf,
+        pca_path_ua=pca_path_ua_rf,
+        scaler_path_ua=scaler_path_ua_rf,
+        model_path_va=model_path_va_rf,
+        pca_path_va=pca_path_va_rf,
+        scaler_path_va=scaler_path_va_rf,
+        window_size=window_size,
+        stride=stride,
+    )
+
+    # SR3 (Regression)
+    device = "cpu"
+    num_features = 256
+    model_path = "models/regression_sr3_24.pth"
+
+    sr3_model = sr3.RegressionSR3(
+        device=device,
+        num_features=num_features,
+        model_path=model_path,
+    )
+
+    current_data_matrix_sr3 = util.bicubic_interpolation(current_data_matrix)
+    current_data_matrix_sr3 = current_data_matrix_sr3.astype(np.float32)
+
+    x = torch.from_numpy(current_data_matrix_sr3)
+    
+    prediction_reg_sr3 = sr3_model.inference(x).detach().numpy()
+    
+    # SR3 (Diffusion)
+    device = "cuda"
+    num_features = 256
+    model_path = "models/diffusion_sr3_24.pth"
+
+    sr3_model = sr3.DiffusionSR3(
+        device=device,
+        T=600,
+        num_features=num_features,
+        model_path=model_path,
+    )
+
+    prediction_diff_sr3 = sr3_model.inference(x).cpu().detach().numpy()
+
     return current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3
+
 
 # plot_random_sample("dataset/val/")
 # plot_random_result()
