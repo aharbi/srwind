@@ -148,7 +148,7 @@ def plot_random_result():
         model_path=model_path,
     )
 
-    prediction_diff_sr3 = sr3_model.inference(x).detach().numpy()
+    prediction_diff_sr3 = sr3_model.inference(x).cpu().detach().numpy()
 
     fig, axs = plt.subplots(2, 7, figsize=(12, 3), constrained_layout=True, dpi=1200)
 
