@@ -179,6 +179,114 @@ def exp_2():
     print("Bicubic - Standard Deviation of SSIM: ", ssim_bicubic.std())
 
 
+
+def exp_2_simplified():
+    """Experiment 2: Compares the performance of a local regression models
+    to bicubic interpolation on the testing set.
+    """
+    # Models parameters
+    window_size = 10
+    stride = 5
+    pca_components = 16
+    train = True
+
+    lr_args = {"alpha": 0.5, "fit_intercept": True}
+
+    rf_args = {
+        "n_estimators": 1000,
+        "max_depth": 16,
+        "n_jobs": -1,
+        "verbose": 2,
+    }
+
+    # Loading data
+    if train:
+        print("Starting training...")
+        data_matrix = np.load("dataset/data_matrix.npy")
+        label_matrix = np.load("dataset/label_matrix.npy")
+
+        X, Y = llr.generate_features(data_matrix, label_matrix, window_size)
+
+        # Training models
+        print("  linear_regression_super_resolution, x-component")
+        llr.linear_regression_super_resolution(
+            X[0], Y[0], "models/", lr_args, pca_components, name="lr_ua.pkl"
+        )
+
+        print("  linear_regression_super_resolution, y-component")
+        llr.linear_regression_super_resolution(
+            X[1], Y[1], "models/", lr_args, pca_components, name="lr_va.pkl"
+        )
+
+    # Ridge regression metrics
+    print("Computing metrics...")
+    metrics_array_rr = metrics.compute_metrics_llr(
+        path="dataset/test/",
+        model_path_ua="models/lr_ua.pkl",
+        pca_path_ua="models/pca_lr_ua.pkl",
+        scaler_path_ua="models/scaler_lr_ua.pkl",
+        model_path_va="models/lr_va.pkl",
+        pca_path_va="models/pca_lr_va.pkl",
+        scaler_path_va="models/scaler_lr_va.pkl",
+        window_size=window_size,
+        stride=stride,
+    )
+
+    psnr_rr = np.vstack([metrics_array_rr[:, 0, 0], metrics_array_rr[:, 1, 0]])
+    mse_rr = np.vstack([metrics_array_rr[:, 0, 1], metrics_array_rr[:, 1, 1]])
+    mae_rr = np.vstack([metrics_array_rr[:, 0, 2], metrics_array_rr[:, 1, 2]])
+    ssim_rr = np.vstack([metrics_array_rr[:, 0, 3], metrics_array_rr[:, 1, 3]])
+
+    # Bicubic Interpolation metrics
+    metrics_array_bicubic = metrics.compute_metrics_bicubic("dataset/test/")
+
+    psnr_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 0], metrics_array_bicubic[:, 1, 0]]
+    )
+    mse_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 1], metrics_array_bicubic[:, 1, 1]]
+    )
+    mae_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 2], metrics_array_bicubic[:, 1, 2]]
+    )
+    ssim_bicubic = np.vstack(
+        [metrics_array_bicubic[:, 0, 3], metrics_array_bicubic[:, 1, 3]]
+    )
+    print("----------------------------------------------")
+    print("RR - Average PSNR: ", np.ma.masked_invalid(psnr_rr).mean())
+    print("RR - Average MSE: ", mse_rr.mean())
+    print("RR - Average MAE: ", mae_rr.mean())
+    print("RR - Average SSIM: ", ssim_rr.mean())
+
+    print("RR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rr).std())
+    print("RR - Standard Deviation of MSE: ", mse_rr.std())
+    print("RR - Standard Deviation of MAE: ", mae_rr.std())
+    print("RR - Standard Deviation of SSIM: ", ssim_rr.std())
+
+    print("RFSR - Average PSNR: ", np.ma.masked_invalid(psnr_rfsr).mean())
+    print("RFSR - Average MSE: ", mse_rfsr.mean())
+    print("RFSR - Average MAE: ", mae_rfsr.mean())
+    print("RFSR - Average SSIM: ", ssim_rfsr.mean())
+
+    print("RFSR - Standard Deviation of PSNR: ", np.ma.masked_invalid(psnr_rfsr).std())
+    print("RFSR - Standard Deviation of MSE: ", mse_rfsr.std())
+    print("RFSR - Standard Deviation of MAE: ", mae_rfsr.std())
+    print("RFSR - Standard Deviation of SSIM: ", ssim_rfsr.std())
+
+    print("Bicubic - Average PSNR: ", np.ma.masked_invalid(psnr_bicubic).mean())
+    print("Bicubic - Average MSE: ", mse_bicubic.mean())
+    print("Bicubic - Average MAE: ", mae_bicubic.mean())
+    print("Bicubic - Average SSIM: ", ssim_bicubic.mean())
+
+    print(
+        "Bicubic - Standard Deviation of PSNR: ",
+        np.ma.masked_invalid(psnr_bicubic).std(),
+    )
+    print("Bicubic - Standard Deviation of MSE: ", mse_bicubic.std())
+    print("Bicubic - Standard Deviation of MAE: ", mae_bicubic.std())
+    print("Bicubic - Standard Deviation of SSIM: ", ssim_bicubic.std())
+
+
 def exp_3():
     device = "cuda"
     num_features = 256
@@ -297,4 +405,4 @@ def exp_4():
 
 
 if __name__ == "__main__":
-    exp_2()
+    exp_2_simplified()
