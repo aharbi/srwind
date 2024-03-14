@@ -4,7 +4,8 @@ import dataset
 import llr
 import sr3
 import metrics
-
+import os
+import matplotlib.pyplot as plt
 
 def exp_1():
     """Experiment 1: Compares the performance of a ridge regression model

@@ -7,7 +7,8 @@ import llr
 import sr3
 import scipy.ndimage as nd
 import scipy.fft as spf
-
+import scipy.stats as stats
+import pdb;
 from skimage.metrics import structural_similarity as ssim
 
 
@@ -81,8 +82,8 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
       avg-pooled images, but where dimension is not reduced.
       
     Args:
-        ref_patch (np.ndarray): reference high-res patch
-        HR_patch (np.ndarray): predicted high-res patch
+        ref_patch (np.ndarray): reference high-res patch (single patch dimension, 100x100)
+        HR_patch (np.ndarray): predicted high-res patch (single dimension patch, 100x100)
     
     Returns:
         float: value of cosine similarity.
@@ -94,7 +95,7 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
         # input: array of dimension 1 x n*d, where n and d are the subarray dimensions passed into scipy filter.
         # output: average over all elements in subArray
                 
-        aVec = np.flatten(subArray)
+        aVec = np.ndarray.flatten(subArray)
         return np.mean(aVec)
 
 
@@ -102,10 +103,12 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
     ref_filt = nd.generic_filter(input=ref_patch, function=filterAvg, size=avgKernel, mode="wrap")
     hr_filt = nd.generic_filter(input=HR_patch, function=filterAvg, size=avgKernel, mode="wrap")
 
-    # step 2: get cos similarity
-    num = ref_filt.dot(hr_filt)
-    den = np.linalg.norm(ref_filt)*np.linalg.norm(hr_filt)
-
+    # step 2: get cos similarity    
+    flatRef = np.ndarray.flatten(ref_filt)
+    flatHR = np.ndarray.flatten(hr_filt)
+    num = flatRef.dot(flatHR)
+    den = np.linalg.norm(flatRef)*np.linalg.norm(flatHR)
+    # import pdb; pdb.set_trace()
     return num/den, ref_filt, hr_filt
 
 
@@ -123,42 +126,105 @@ def kinetic_energy_spectra(ref_patch: np.ndarray, HR_patch: np.ndarray):
         ndarray: 1xnd vector containing the "frequency" values
     """
 
+    # image = ref_patch
+    # npix = image.shape[0]
+    # fourier_image = np.fft.fftn(image)
+    # fourier_amplitudes = np.abs(fourier_image)**2
+    # fourier_amplitudes = np.fft.fftshift(fourier_amplitudes)
+
+    # kfreq = np.fft.fftfreq(npix) * npix
+    # kfreq2D = np.meshgrid(kfreq, kfreq)
+    # knrm = np.sqrt(kfreq2D[0]**2 + kfreq2D[1]**2)
+
+    # knrm = knrm.flatten()
+    # fourier_amplitudes = fourier_amplitudes.flatten()
+
+    # kbins = np.arange(0.5, npix//2+1, 1.)
+    # kvals = (kbins[1:] + kbins[:-1])
+    # pdb.set_trace()
+    # Abins, _, _ = stats.binned_statistic(knrm, fourier_amplitudes,
+    #                                     statistic = "mean",
+    #                                     bins = kbins)
+    # Abins *= np.pi * (kbins[1:]**2 - kbins[:-1]**2)
+    # pdb.set_trace()
+    # return np.flip(kvals), Abins
+
+
+    import pdb
     # get frequency axis
     xdims = ref_patch.shape[1] # returns pixels along x-axis
     ydims = ref_patch.shape[0] # gets number of rows in patch
+    # df = 1/xdims
+    freqs = spf.fftfreq(n=xdims)  # generate frequency domain sample points [cycles/pixel]
 
-    df = 1/xdims
-    freqs = spf.fftfreq(n = xdims, d = df)  # generate frequency domain sample points [cycles/pixel]
+    # normalize each patch to self
+    ref_min = np.min(ref_patch)
+    hr_min = np.min(HR_patch)
+    ref_max = np.max(ref_patch)
+    hr_max = np.max(HR_patch)
+    
+    # pdb.set_trace()
+    ref_patch = np.divide(ref_patch-ref_min, ref_max-ref_min)
+    HR_patch = np.divide(HR_patch-hr_min, hr_max-hr_min)
 
     # loop over slices and get averaged ffts
-    ref_fft = hr_fft = np.zeros((1,xdims))
-    ref_psd = hr_psd = np.zeros((1,xdims))
+    # ref_psd = hr_psd = np.zeros((1,xdims))
     
-    for ii in np.arange(ydims):
-        tempRef = spf.fft(ref_patch[ii,:])
-        tempHR = spf.fft(HR_patch[ii,:])
+    # alt in 2D - requires getting proper k vectors
+    # ref_fft = np.ndarray.flatten(spf.fft(ref_patch))
+    # hr_fft = np.ndarray.flatten(spf.fft(HR_patch))
 
-        ref_fft += tempRef
-        hr_fft += tempHR
+    # ref_psd = np.square(np.abs(ref_fft))
+    # hr_psd  = np.square(np.abs(hr_fft))
 
-        ref_psd += np.square(np.abs(tempRef))
-        hr_psd += np.square(np.abs(tempHR))
+    hr_psd = np.square(spf.fftn(HR_patch))
+    ref_psd = np.square(spf.fftn(ref_patch))
+
+    # putting kVals into 2D space
+    freqsX, freqsY = np.meshgrid(freqs,freqs) # returns "grid" of k0k0, k0k1, k0k2,...; k1k0, k1k1, ... etc.
+    kvals = np.sqrt(freqsX**2 + freqsY**2) # get vector of "distances" to each pixel
+
+    # flatten everythign into vectors
+    kvals = kvals.flatten()
+    hr_psd = hr_psd.flatten()
+    ref_psd = ref_psd.flatten()
+
+    # for ii in np.arange(ydims):
+    #     tempRef = spf.fft(ref_patch[ii,:])
+    #     tempHR = spf.fft(HR_patch[ii,:])
+
+    #     # ref_fft += tempRef
+    #     # hr_fft += tempHR
+
+    #     ref_psd += np.square(np.abs(tempRef))
+    #     hr_psd += np.square(np.abs(tempHR))
     
-    ref_fft_avg = ref_fft/ydims
-    hr_fft_avg = hr_fft/ydims
+    # ref_fft_avg = ref_fft/ydims
+    # hr_fft_avg = hr_fft/ydims
 
-    ref_psd_avg = ref_psd/ydims
-    hr_psd_avg = hr_psd/ydims
+    # ref_psd_avg = ref_psd/ydims
+    # hr_psd_avg = hr_psd/ydims
 
     # shift psds and freqs
-    ref_fft_shifted = spf.fftshift(ref_fft_avg)
-    hr_fft_shifted = spf.fftshift(hr_fft_avg)
-    ref_psd_shifted = spf.fftshift(ref_psd_avg)
-    hr_psd_shifted = spf.fftshift(hr_psd_avg)
-    freqs_shifted = spf.fftshift(freqs)
+    # ref_fft_shifted = spf.fftshift(ref_fft_avg)
+    # hr_fft_shifted = spf.fftshift(hr_fft_avg)
+    # ref_psd_shifted = spf.fftshift(ref_psd_avg)
+    # hr_psd_shifted = spf.fftshift(hr_psd_avg)
+    # ref_psd_shifted = spf.fftshift(ref_psd).flatten()
+    # hr_psd_shifted = spf.fftshift(hr_psd).flatten()
+    # freqs_shifted = spf.fftshift(freqs)
+    # return freqs_shifted, ref_psd_shifted, hr_psd_shifted
+    
+    numBins = xdims//2
+    kbins = np.linspace(kvals.min(), kvals.max(), numBins)
 
+    hist_ref,kbinEdges,_ = stats.binned_statistic(kvals, ref_psd, statistic="mean", bins=kbins)
+    hist_hr,kbinEdges,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
+    
+    # pdb.set_trace()
      # return everything
-    return freqs_shifted, ref_psd_shifted, hr_psd_shifted
+    return kbins, hist_ref, hist_hr
+
 
 
 def compute_physics_metrics(ref_patches: np.ndarray, HR_patches: np.ndarray, avg_kernel = 5):

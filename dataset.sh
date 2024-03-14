@@ -14,7 +14,7 @@ mkdir dataset
 # Uncomment to use 7z instead of unzip
 # 7z x "dataset/train.zip" -o./dataset/
 # 7z x "dataset/val.zip" -o./dataset/
-# 7z x "dataset/test.zip" -o./dataset/
+7z x "dataset/test.zip" -o./dataset/
 
 # Download the processed dataset
 gdown --id "1erKwFcJNoPMFRRE20bj4cDFZtWI0XbCn" -O "dataset/"
