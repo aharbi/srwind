@@ -63,7 +63,7 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
 
     return overlaps, ref_filt_all, hr_filt_all
 
-def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
+def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10, fname="cos_sim"):
     """
     Experiment Physics Metrics: Performs cosine similarity for different averaging amounts
     and computes the energy spectra for the resulting turbulence values.    
@@ -71,7 +71,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
     """
 
     # set up saving and results storage
-    saveDR = "./physics_metrics/"
+    saveDR = "./physics_metrics_server/"
     try:
         os.mkdir(saveDR)        
     except:
@@ -161,8 +161,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
     Cos_Sim_Dict["kernels"] = kernels
 
     # step four: write dict to json file in saveDR
-    fname = "cos_sim_data.json"
-    f = open(saveDR+fname, "w")
+    f = open(saveDR+fname+".json", "w")
     json.dump(Cos_Sim_Dict, f, sort_keys=True, indent=2)
     # pdb.set_trace()
     f.close()
@@ -170,11 +169,10 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
     return
 
 
-def process_cos_sim():
+def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
     # step 1: load the stored json data
     saveDR = "./physics_metrics_server/"
-    saveName = "cos_sim_200imgs"
-    fname = "cos_sim_data_200imgs.json"
+    fname = loadname
 
     f = open(saveDR+fname, "r")
     Cos_Sim_Dict = json.load(f)
@@ -199,8 +197,7 @@ def process_cos_sim():
         # pdb.set_trace()
 
     # save processed data
-    fname = "cos_sim_proc.json"
-    f = open(saveDR+fname, "w")
+    f = open(saveDR+saveName+".json", "w")
     json.dump(avgs, f, sort_keys=True, indent=2)
 
     # step 3: plot in bar chart - xdata
@@ -258,9 +255,9 @@ def process_cos_sim():
 
 def main(args):
     if args.step == 0:
-        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs)
+        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname=args.fname)
     elif args.step == 1:
-        process_cos_sim()
+        process_cos_sim(saveName=args.fname, loadname=args.loadname)
     else:
         print("Invalid flag.")
 
@@ -268,6 +265,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--step", type=int, default=1) # pass 0 for computing or 1 for post-processing
     parser.add_argument("--numImgs", type=int, default=100)
+    parser.add_argument("--loadname", default="cos_sim")
+    parser.add_argument("--fname", default="cos_sim")
     args = parser.parse_args()
     main(args)
     
