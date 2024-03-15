@@ -331,7 +331,7 @@ def process_KE(saveName="turbulence", loadname="cos_sim_turb_KE_10", kernel=1):
     plt.tight_layout()
     plt.title("Energy Spectrum of Turbulence: Kernel = {}".format(kernel))
     plt.legend()
-    plt.savefig(fname+".png", dpi=1000, transparent=True, bbox_inches='tight')
+    plt.savefig(saveName+".png", dpi=1000, transparent=True, bbox_inches='tight')
     plt.show()
 
     return
