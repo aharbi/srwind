@@ -289,7 +289,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
     f = open(saveDR+fname+".json", "w")
     json.dump(Cos_Sim_Dict, f, sort_keys=True, indent=2)
     g = open(saveDR+fname+"_kinEn.json", "w")
-    json.dump(Kin_En_Dict, f, sort_keys=True, indent=2)
+    json.dump(Kin_En_Dict, g, sort_keys=True, indent=2)
     # pdb.set_trace()
     f.close()
     g.close()
