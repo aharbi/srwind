@@ -82,6 +82,7 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
     # loop over channels
     for ii in np.arange(numChs):
         # step 1: get scipy generic filter
+        pdb.set_trace()
         ref_filt = nd.generic_filter(input=ref_patch[ii,:,:], function=filterAvg, size=avgKernel, mode="wrap")
         hr_filt = nd.generic_filter(input=HR_patch[ii,:,:], function=filterAvg, size=avgKernel, mode="wrap")
 
@@ -144,7 +145,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         pred_rf,
         pred_reg_sr3,
         pred_dif_sr3) = visualization.compute_random_result()
-        pdb.set_trace()
+        # pdb.set_trace()
         # step two: iterate cosine_similarity over kernels
 
         numKernels = 1
