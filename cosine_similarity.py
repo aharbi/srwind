@@ -86,7 +86,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20]):
         "kernels": []
     }
 
-    numImgs = 20
+    numImgs = 10
 
     for ii in np.arange(numImgs):
         # step one: load random test result
@@ -204,8 +204,8 @@ def process_cos_sim():
     return
 
 if __name__ == "__main__":
-    # exp_cos_sim()
-    process_cos_sim()
+    exp_cos_sim()
+    # process_cos_sim()
 
 
 

@@ -272,63 +272,63 @@ def compute_random_result():
     )
 
     # TEMPORARY COMMENT OUT FOR LOCAL DEV - JFH
-    # # Random Forest
-    # window_size = 10
-    # stride = 5
+    # Random Forest
+    window_size = 10
+    stride = 5
 
-    # model_path_ua_rf = "models/rfsr_ua_10.pkl"
-    # pca_path_ua_rf = "models/pca_rfsr_ua_10.pkl"
-    # scaler_path_ua_rf = "models/scaler_rfsr_ua_10.pkl"
+    model_path_ua_rf = "models/rfsr_ua_10.pkl"
+    pca_path_ua_rf = "models/pca_rfsr_ua_10.pkl"
+    scaler_path_ua_rf = "models/scaler_rfsr_ua_10.pkl"
 
-    # model_path_va_rf = "models/rfsr_va_10.pkl"
-    # pca_path_va_rf = "models/pca_rfsr_va_10.pkl"
-    # scaler_path_va_rf = "models/scaler_rfsr_va_10.pkl"
+    model_path_va_rf = "models/rfsr_va_10.pkl"
+    pca_path_va_rf = "models/pca_rfsr_va_10.pkl"
+    scaler_path_va_rf = "models/scaler_rfsr_va_10.pkl"
 
-    # print("  Random Forest...")
-    # prediction_rf = llr.predict(
-    #     data_matrix=current_data_matrix,
-    #     model_path_ua=model_path_ua_rf,
-    #     pca_path_ua=pca_path_ua_rf,
-    #     scaler_path_ua=scaler_path_ua_rf,
-    #     model_path_va=model_path_va_rf,
-    #     pca_path_va=pca_path_va_rf,
-    #     scaler_path_va=scaler_path_va_rf,
-    #     window_size=window_size,
-    #     stride=stride,
-    # )
+    print("  Random Forest...")
+    prediction_rf = llr.predict(
+        data_matrix=current_data_matrix,
+        model_path_ua=model_path_ua_rf,
+        pca_path_ua=pca_path_ua_rf,
+        scaler_path_ua=scaler_path_ua_rf,
+        model_path_va=model_path_va_rf,
+        pca_path_va=pca_path_va_rf,
+        scaler_path_va=scaler_path_va_rf,
+        window_size=window_size,
+        stride=stride,
+    )
 
-    # # SR3 (Regression)
-    # device = "cpu"
-    # num_features = 256
-    # model_path = "models/regression_sr3_24.pth"
-    # print("  SR3 Regression...")
-    # sr3_model = sr3.RegressionSR3(
-    #     device=device,
-    #     num_features=num_features,
-    #     model_path=model_path,
-    # )
+    # SR3 (Regression)
+    device = "cpu"
+    num_features = 256
+    model_path = "models/regression_sr3_24.pth"
+    print("  SR3 Regression...")
+    sr3_model = sr3.RegressionSR3(
+        device=device,
+        num_features=num_features,
+        model_path=model_path,
+    )
 
-    # current_data_matrix_sr3 = util.bicubic_interpolation(current_data_matrix)
-    # current_data_matrix_sr3 = current_data_matrix_sr3.astype(np.float32)
+    current_data_matrix_sr3 = util.bicubic_interpolation(current_data_matrix)
+    current_data_matrix_sr3 = current_data_matrix_sr3.astype(np.float32)
 
-    # x = torch.from_numpy(current_data_matrix_sr3)
+    x = torch.from_numpy(current_data_matrix_sr3)
     
-    # prediction_reg_sr3 = sr3_model.inference(x).detach().numpy()
+    prediction_reg_sr3 = sr3_model.inference(x).detach().numpy()
     
-    # # SR3 (Diffusion)
-    # device = "cuda"
-    # num_features = 256
-    # model_path = "models/diffusion_sr3_24.pth"
+    # SR3 (Diffusion)
+    device = "cuda"
+    num_features = 256
+    model_path = "models/diffusion_sr3_24.pth"
 
-    # print("  SR3 Diffusion...")
-    # sr3_model = sr3.DiffusionSR3(
-    #     device=device,
-    #     T=600,
-    #     num_features=num_features,
-    #     model_path=model_path,
-    # )
+    print("  SR3 Diffusion...")
+    sr3_model = sr3.DiffusionSR3(
+        device=device,
+        T=600,
+        num_features=num_features,
+        model_path=model_path,
+    )
 
-    # prediction_diff_sr3 = sr3_model.inference(x).cpu().detach().numpy()
+    prediction_diff_sr3 = sr3_model.inference(x).cpu().detach().numpy()
 
     prediction_rf = []
     prediction_reg_sr3 = []
