@@ -108,6 +108,13 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
         bi_results_y = []
         rr_results_x = []
         rr_results_y = []
+        rf_results_x = []
+        rf_results_y = []
+        sr3_reg_results_x = []
+        sr3_reg_results_y = []
+        sr3_dif_results_x = []
+        sr3_dif_results_y = []
+        
 
         print("Image {} : {}".format(ii+1,numImgs))
         for jj in np.arange(numKernels):            
@@ -124,13 +131,32 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
             rr_results_x.append(overlaps[0,0])
             rr_results_y.append(overlaps[0,1])
 
+            # RANDOM FOREST
+            overlaps,_,_ = cos_similarity(ref_patch=curr_label[0,:,:,:], HR_patch=pred_rf[0,:,:,:], avgKernel=kernel)
+            rf_results_x.append(overlaps[0,0])
+            rf_results_y.append(overlaps[0,1])
+
+            # SR3 REG
+            overlaps,_,_ = cos_similarity(ref_patch=curr_label[0,:,:,:], HR_patch=pred_reg_sr3[0,:,:,:], avgKernel=kernel)
+            sr3_reg_results_x.append(overlaps[0,0])
+            sr3_reg_results_y.append(overlaps[0,1])
+
+            # SR3 DIFF.
+            overlaps,_,_ = cos_similarity(ref_patch=curr_label[0,:,:,:], HR_patch=pred_dif_sr3[0,:,:,:], avgKernel=kernel)
+            sr3_dif_results_x.append(overlaps[0,0])
+            sr3_dif_results_y.append(overlaps[0,1])
+
         # step three: append results to respective locations in dictionary
         Cos_Sim_Dict["Bicubic"]["x"].append(bi_results_x)
         Cos_Sim_Dict["Bicubic"]["y"].append(bi_results_y)
-        Cos_Sim_Dict["RidgeRegression"]["x"].append(bi_results_x)
-        Cos_Sim_Dict["RidgeRegression"]["y"].append(bi_results_y)
-                
-        # pdb.set_trace()
+        Cos_Sim_Dict["RidgeRegression"]["x"].append(rr_results_x)
+        Cos_Sim_Dict["RidgeRegression"]["y"].append(rr_results_y)
+        Cos_Sim_Dict["RandomForest"]["x"].append(rf_results_x)
+        Cos_Sim_Dict["RandomForest"]["y"].append(rf_results_y)
+        Cos_Sim_Dict["SR3_Reg"]["x"].append(sr3_reg_results_x)
+        Cos_Sim_Dict["SR3_Reg"]["y"].append(sr3_reg_results_y)
+        Cos_Sim_Dict["SR3_Diff"]["x"].append(sr3_dif_results_x)
+        Cos_Sim_Dict["SR3_Diff"]["y"].append(sr3_dif_results_y)
 
     Cos_Sim_Dict["kernels"] = kernels
 
