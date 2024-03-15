@@ -140,7 +140,7 @@ def kinetic_energy_spectra(
             json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
             g.close() 
 
-            compare_outputs()
+    compare_outputs()
 
     return
 
