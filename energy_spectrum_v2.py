@@ -69,7 +69,8 @@ def kinetic_energy_spectra(
         hr_max = np.max(HR_patch)
         
         # pdb.set_trace()
-        HR_patch = np.divide(HR_patch-hr_min, hr_max-hr_min)
+        # HR_patch = np.divide(HR_patch-hr_min, hr_max-hr_min)
+        # pdb.set_trace()
 
         # get power spectrum
         hr_psd = np.square(spf.fftn(HR_patch))
