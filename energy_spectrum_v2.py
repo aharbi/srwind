@@ -85,11 +85,11 @@ def kinetic_energy_spectra(
         hr_psd = hr_psd.flatten()
 
         numBins = 50
-        kbins = np.linspace(0, 100, numBins)
+        kbins = np.linspace(0, 101, numBins)
 
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
         
-        pdb.set_trace()
+        # pdb.set_trace()
         # return everything
         return kbins, hist_hr
 
@@ -158,6 +158,7 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
             E = np.mean(Energy_Spectrum[model]['y'], axis=0)
 
             # add normalization
+            pdb.set_trace()
             totalEnergy = ig.trapezoid(E, k[:-1])
             print("\nTotal Energies: ")
             print(totalEnergy)
