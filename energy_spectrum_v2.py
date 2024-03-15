@@ -7,7 +7,7 @@ import scipy.integrate as ig
 import matplotlib.pyplot as plt
 import json
 import argparse
-
+import visualization
 Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
                        'LR':  {'x':[], 'y':[]}, 
                         'Bicubic':  {'x':[], 'y':[]}, 
