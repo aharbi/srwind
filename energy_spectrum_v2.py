@@ -137,6 +137,7 @@ def kinetic_energy_spectra(
             Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2.tolist())
             Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek.tolist())
 
+            pdb.set_trace()
             g = open(fname+"_ch{}.json".format(i), "w")
             json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
             g.close() 
