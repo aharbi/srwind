@@ -396,7 +396,7 @@ if __name__ == "__main__":
     parser.add_argument("--numImgs", type=int, default=100)
     parser.add_argument("--loadname", default="cos_sim")
     parser.add_argument("--fname", default="cos_sim")
-    parser.add_argument("--kernel", default=1)
+    parser.add_argument("--kernel", type=int, default=1)
     args = parser.parse_args()
     main(args)
     
