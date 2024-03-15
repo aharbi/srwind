@@ -72,9 +72,9 @@ def kinetic_energy_spectra(
             wind_profile = current_label_matrix[i,:,:]
             # Normalization against itself (to capture variations)
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['HR']['x'].append(HR_kvals2)
@@ -83,9 +83,9 @@ def kinetic_energy_spectra(
             wind_profile = current_data_matrix[i,:,:]
             # Normalization against itself (to capture variations)        
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['LR']['x'].append(HR_kvals2)
@@ -94,9 +94,9 @@ def kinetic_energy_spectra(
             wind_profile = prediction_bi[i,:,:]
             # Normalization against itself (to capture variations)
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Bicubic']['x'].append(HR_kvals2)
@@ -105,9 +105,9 @@ def kinetic_energy_spectra(
             wind_profile = prediction_rr[i,:,:]
             # Normalization against itself (to capture variations)
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Ridge Regression']['x'].append(HR_kvals2)
@@ -116,9 +116,9 @@ def kinetic_energy_spectra(
             wind_profile = prediction_rf[i,:,:]
             # Normalization against itself (to capture variations)
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Random Forest']['x'].append(HR_kvals2)
@@ -126,10 +126,10 @@ def kinetic_energy_spectra(
     
             wind_profile = prediction_reg_sr3[i,:,:]
             # Normalization against itself (to capture variations)
-            # wind_profile_normalized = wind_profile            
+            wind_profile_normalized = wind_profile            
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2)
@@ -137,10 +137,10 @@ def kinetic_energy_spectra(
     
             wind_profile = prediction_diff_sr3[i,:,:]
             # Normalization against itself (to capture variations)
-            # wind_profile_normalized = wind_profile
+            wind_profile_normalized = wind_profile
             # wind_profile_normalized = ((wind_profile - wind_profile.min()) / (wind_profile.max() - wind_profile.min()) * 255).astype(np.uint8)
             # Alternative: Normalization against the HR image
-            wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
+            # wind_profile_normalized = ((wind_profile - min) / (max - min) * 255).astype(np.uint8)
             image = Image.fromarray(wind_profile_normalized)
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2)
