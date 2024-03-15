@@ -89,7 +89,7 @@ def kinetic_energy_spectra(
 
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
         
-        # pdb.set_trace()
+        pdb.set_trace()
         # return everything
         return kbins, hist_hr
 
