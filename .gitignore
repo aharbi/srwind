@@ -163,4 +163,5 @@ cython_debug/
 /dataset
 /figures
 /physics_metrics
+/physics_metrics_server
 /models

@@ -98,7 +98,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
         pred_rf,
         pred_reg_sr3,
         pred_dif_sr3) = visualization.compute_random_result()
-
+        pdb.set_trace()
         # step two: iterate cosine_similarity over kernels
 
         numKernels = len(kernels)
