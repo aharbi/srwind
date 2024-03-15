@@ -15,6 +15,7 @@ import json
 import argparse
 from PIL import Image
 import matplotlib.image as mpimg
+import scipy.integrate as ig
 
 """
 This script is similar to the cosine_turbulence.py script. However, this one then subtracts out the averaged matrix values and computes
@@ -177,7 +178,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_bi[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -191,7 +193,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = curr_label[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -209,7 +212,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_rr[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -227,7 +231,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_rf[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -245,7 +250,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_reg_sr3[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -263,7 +269,8 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_dif_sr3[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
+        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
         image = Image.fromarray(turb_x_norm)
@@ -297,6 +304,38 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
     return
 
 
+def process_KE(saveName="turbulence", loadname="cos_sim_turb_KE_10", kernel=1):
+    # step 1: load the stored json data
+    saveDR = "./physics_metrics_server/"
+    fname = loadname
+
+    f = open(saveDR+fname+".json", "r")
+    KE_Dict = json.load(f)
+    f.close()
+    
+    colors = {'HR': 'black', 'LR': 'pink','Bicubic': 'tab:blue', 'RidgeRegression': 'tab:orange', 'RandomForest': 'tab:green', 'SR3_Reg': 'tab:red', 'SR3_Diff': 'tab:purple'}
+    
+    for model in KE_Dict:
+        # pdb.set_trace()
+        k = np.flip(np.mean(KE_Dict[model]["k"], axis=0))
+        E = np.mean(KE_Dict[model]["E"], axis=0) / 10000
+
+        # add normalization
+        totalEnergy = ig.trapezoid(np.flip(E), np.flip(k))
+        print("\nTotal Energies: ")
+        print(totalEnergy)
+        plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
+
+    plt.xlabel("k (wavenumber)")
+    plt.ylabel("Kinetic Energy")
+    plt.tight_layout()
+    plt.title("Energy Spectrum of Turbulence: Kernel = {}".format(kernel))
+    plt.legend()
+    plt.savefig(fname+".png", dpi=1000, transparent=True, bbox_inches='tight')
+    plt.show()
+
+    return
+
 def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
     # step 1: load the stored json data
     saveDR = "./physics_metrics_server/"
@@ -318,11 +357,15 @@ def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
     }
     
     for model in avgs:
+        # process for cos sim data
         avgs[model]["avgs_x"] = np.mean(Cos_Sim_Dict[model]["x"], axis=0).tolist()
         avgs[model]["stds_x"] = np.std(Cos_Sim_Dict[model]["x"], axis=0).tolist()
         avgs[model]["avgs_y"] = np.mean(Cos_Sim_Dict[model]["y"], axis=0).tolist()
         avgs[model]["stds_y"] = np.std(Cos_Sim_Dict[model]["y"], axis=0).tolist()
         # pdb.set_trace()
+
+        # process KE data
+
 
     # save processed data
     f = open(saveDR+saveName+".json", "w")
@@ -387,6 +430,8 @@ def main(args):
         exp_cos_sim(kernel=args.kernel, numImgs=args.numImgs, fname=saveName)
     elif args.step == 1:
         process_cos_sim(saveName=saveName, loadname=args.loadname)
+    elif args.step == 2:
+        process_KE(saveName=saveName+"_Kernel_{}".format(args.kernel), loadname=args.loadname, kernel=args.kernel)
     else:
         print("Invalid flag.")
 
