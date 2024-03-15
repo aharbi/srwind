@@ -330,9 +330,7 @@ def compute_random_result():
 
     prediction_diff_sr3 = sr3_model.inference(x).cpu().detach().numpy()
 
-    prediction_rf = []
-    prediction_reg_sr3 = []
-    prediction_diff_sr3 = []
+    
 
     return current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3
 

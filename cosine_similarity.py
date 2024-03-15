@@ -172,8 +172,9 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
 
 def process_cos_sim():
     # step 1: load the stored json data
-    saveDR = "./physics_metrics/"
-    fname = "cos_sim_data.json"
+    saveDR = "./physics_metrics_server/"
+    saveName = "cos_sim_200imgs"
+    fname = "cos_sim_data_200imgs.json"
 
     f = open(saveDR+fname, "r")
     Cos_Sim_Dict = json.load(f)
@@ -207,7 +208,7 @@ def process_cos_sim():
     fig,ax = plt.subplots(1,1,figsize=(10,8))
     modelList = []
     kernels = Cos_Sim_Dict["kernels"]
-    x = np.arange(len(kernels))
+    x = 2*np.arange(len(kernels))
     multiplier = 0
 
     for model in avgs:
@@ -222,19 +223,16 @@ def process_cos_sim():
 
     numModelsPlotted = len(modelList)
     ax.set_xticks(x+numModelsPlotted/2 * width, kernels)
-    ax.legend(loc="upper right", ncols=numModelsPlotted)
-    ax.axis([-1, x[-1]+1, 0.99, 1.0])
+    ax.legend(loc="lower right", ncols=numModelsPlotted)
+    ax.axis([-1, x[-1]+2, 0.98, 1.0])
     ax.set_xlabel("Averaging Kernel Size")
     ax.set_ylabel("Cosine Similarity (ua)")
     # plt.show()    
-    plt.savefig(saveDR+"cosine_similarity_ua.png")
+    plt.savefig(saveDR+saveName+"_ua.png")
 
-    # step 4: plot in bar chart - ydata
-    width = 0.25
+    # step 4: plot in bar chart - ydata    
     fig2,ax2 = plt.subplots(1,1,figsize=(10,8))
     modelList = []
-    kernels = Cos_Sim_Dict["kernels"]
-    x = np.arange(len(kernels))
     multiplier = 0
 
     for model in avgs:
@@ -249,12 +247,12 @@ def process_cos_sim():
 
     numModelsPlotted = len(modelList)
     ax2.set_xticks(x+numModelsPlotted/2 * width, kernels)
-    ax2.legend(loc="upper right", ncols=numModelsPlotted)
-    ax2.axis([-1, x[-1]+1, 0.99, 1.0])
+    ax2.legend(loc="lower right", ncols=numModelsPlotted)
+    ax2.axis([-1, x[-1]+2, 0.98, 1.0])
     ax2.set_xlabel("Averaging Kernel Size")
     ax2.set_ylabel("Cosine Similarity (va)")
     # plt.show()    
-    plt.savefig(saveDR+"cosine_similarity_va.png")
+    plt.savefig(saveDR+saveName+"_va.png")
 
     return
 

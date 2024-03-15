@@ -7,7 +7,7 @@ import scipy.stats as stats
 import os
 import random
 from PIL import Image
-
+import argparse
 import dataset
 import visualization 
 
@@ -156,9 +156,14 @@ def plot_energy_spectra():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--numImgs", type=int, default=100)
+    args = parser.parse_args()
 
-    num_images = 100
+    num_images = args.numImgs
+
     for i in range(num_images):
+        print("Image: {}/{}".format(i,num_images))
         current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.compute_random_result()
 
         
