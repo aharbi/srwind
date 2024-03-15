@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import json
 import argparse
 import visualization
+
 Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
                        'LR':  {'x':[], 'y':[]}, 
                         'Bicubic':  {'x':[], 'y':[]}, 
@@ -29,7 +30,7 @@ def kinetic_energy_spectra(
         prediction_diff_sr3
     ):
     
-    def energy_spectrum(ref_patch: np.ndarray, HR_patch: np.ndarray):
+    def energy_spectrum(HR_patch: np.ndarray):
         """Computes PSD of image. Takes slices of images for comparison and then 
         averages overa all slices.
 
@@ -45,23 +46,19 @@ def kinetic_energy_spectra(
 
         import pdb
         # get frequency axis
-        xdims = ref_patch.shape[1] # returns pixels along x-axis
-        ydims = ref_patch.shape[0] # gets number of rows in patch
+        xdims = HR_patch.shape[1] # returns pixels along x-axis
+        ydims = HR_patch.shape[0] # gets number of rows in patch
         freqs = spf.fftfreq(n=xdims)  # generate frequency domain sample points [cycles/pixel]
 
         # normalize each patch to self
-        ref_min = np.min(ref_patch)
         hr_min = np.min(HR_patch)
-        ref_max = np.max(ref_patch)
         hr_max = np.max(HR_patch)
         
         # pdb.set_trace()
-        ref_patch = np.divide(ref_patch-ref_min, ref_max-ref_min)
         HR_patch = np.divide(HR_patch-hr_min, hr_max-hr_min)
 
         # get power spectrum
         hr_psd = np.square(spf.fftn(HR_patch))
-        ref_psd = np.square(spf.fftn(ref_patch))
 
         # putting kVals into 2D space
         freqsX, freqsY = np.meshgrid(freqs,freqs) # returns "grid" of k0k0, k0k1, k0k2,...; k1k0, k1k1, ... etc.
@@ -70,16 +67,14 @@ def kinetic_energy_spectra(
         # flatten everythign into vectors
         kvals = kvals.flatten()
         hr_psd = hr_psd.flatten()
-        ref_psd = ref_psd.flatten()
 
         numBins = 50
         kbins = np.linspace(0, 100, numBins)
 
-        hist_ref,_,_ = stats.binned_statistic(kvals, ref_psd, statistic="mean", bins=kbins)
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
         
         # return everything
-        return kbins, hist_ref, hist_hr
+        return kbins, hist_hr
 
 
     def compare_outputs():
