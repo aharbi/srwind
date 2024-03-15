@@ -25,13 +25,13 @@ original implementation, which seem unreasonable to include.
 """
 
 Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
-                       'LR':  {'x':[], 'y':[]}, 
-                        'Bicubic':  {'x':[], 'y':[]}, 
-                        'Ridge Regression':  {'x':[], 'y':[]}, 
-                        'Random Forest':  {'x':[], 'y':[]}, 
-                        'SR3 (Regression)':  {'x':[], 'y':[]}, 
-                        'SR3 (Diffusion)':  {'x':[], 'y':[]}
-                       }
+                    'LR':  {'x':[], 'y':[]}, 
+                    'Bicubic':  {'x':[], 'y':[]}, 
+                    'Ridge Regression':  {'x':[], 'y':[]}, 
+                    'Random Forest':  {'x':[], 'y':[]}, 
+                    'SR3 (Regression)':  {'x':[], 'y':[]}, 
+                    'SR3 (Diffusion)':  {'x':[], 'y':[]}
+                }
 
 
 
@@ -42,7 +42,8 @@ def kinetic_energy_spectra(
         prediction_rr, 
         prediction_rf, 
         prediction_reg_sr3,
-        prediction_diff_sr3
+        prediction_diff_sr3, 
+        fname="./wind_spectrum_norm"
     ):
     
     def energy_spectrum(HR_patch: np.ndarray):
@@ -74,7 +75,7 @@ def kinetic_energy_spectra(
 
         # get power spectrum
         hr_psd = np.square(spf.fftn(HR_patch))
-
+        pdb.set_trace()
         # putting kVals into 2D space
         freqsX, freqsY = np.meshgrid(freqs,freqs) # returns "grid" of k0k0, k0k1, k0k2,...; k1k0, k1k1, ... etc.
         kvals = np.sqrt(freqsX**2 + freqsY**2) # get vector of "distances" to each pixel - from WiSo paper
@@ -97,16 +98,19 @@ def kinetic_energy_spectra(
             min = current_label_matrix[i,:,:].min()
             max = current_label_matrix[i,:,:].max()
             
+            # HIGH RES
             image = current_label_matrix[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['HR']['x'].append(HR_kvals2.tolist())
             Energy_Spectrum['HR']['y'].append(HR_ek.tolist())
     
+            # LOW RES
             image = current_data_matrix[i,:,:]
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['LR']['x'].append(HR_kvals2.tolist())
             Energy_Spectrum['LR']['y'].append(HR_ek.tolist())
     
+            # BICUBIC
             image = prediction_bi[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Bicubic']['x'].append(HR_kvals2.tolist())
@@ -132,37 +136,39 @@ def kinetic_energy_spectra(
             Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2.tolist())
             Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek.tolist())
 
-    compare_outputs()
+            g = open(fname+"_ch{}.json".format(i), "w")
+            json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
+            g.close() 
+
+            compare_outputs()
 
     return
 
 
 def plot_energy_spectra(fname="./wind_spectrum_norm"):
     colors = {'HR': 'black', 'LR': 'pink','Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'}
-    pdb.set_trace()
-    g = open(fname+".json", "w")
-    json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
-    g.close() 
+    for i in range(2):
+        f = open(fname+"_ch{}.json".format(i), "r")
+        Energy_Spectrum = json.load(f)
+        f.close()
 
-    pdb.set_trace()
+        for model in Energy_Spectrum:
+            k = (np.mean(Energy_Spectrum[model]['x'], axis=0))
+            E = np.mean(Energy_Spectrum[model]['y'], axis=0)
 
-    for model in Energy_Spectrum:
-        k = (np.mean(Energy_Spectrum[model]['x'], axis=0))
-        E = np.mean(Energy_Spectrum[model]['y'], axis=0)
+            # add normalization
+            totalEnergy = ig.trapezoid(E, k[:-1])
+            print("\nTotal Energies: ")
+            print(totalEnergy)
+            plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
 
-        # add normalization
-        totalEnergy = ig.trapezoid(E, k[:-1])
-        print("\nTotal Energies: ")
-        print(totalEnergy)
-        plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
-
-    plt.xlabel("k (cycles/pixel)")
-    plt.ylabel("Kinetic Energy")
-    plt.tight_layout()
-    plt.title("Energy Spectrum")
-    plt.legend()
-    plt.savefig(fname+".png", dpi=1000, transparent=False, bbox_inches='tight')
-    plt.show()
+        plt.xlabel("k (cycles/pixel)")
+        plt.ylabel("Kinetic Energy")
+        plt.tight_layout()
+        plt.title("Energy Spectrum")
+        plt.legend()
+        plt.savefig(fname+"_ch{}.png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
+        # plt.show()
 
     return
 
@@ -185,7 +191,8 @@ if __name__ == "__main__":
             prediction_rr[0,:,:,:], 
             prediction_rf[0,:,:,:], 
             prediction_reg_sr3[0,:,:,:],
-            prediction_diff_sr3[0,:,:,:]
+            prediction_diff_sr3[0,:,:,:],
+            fname=args.savePath
         )
         
     plot_energy_spectra(fname=args.savePath)
