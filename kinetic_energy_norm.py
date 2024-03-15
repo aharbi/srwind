@@ -150,7 +150,8 @@ def plot_energy_spectra(fname="wind_spectrum_norm"):
         E = np.mean(Energy_Spectrum[model]['y'], axis=0) / 10000
 
         # add normalization
-        totalEnergy = ig.trapezoid(E,k)
+        totalEnergy = ig.trapezoid(np.flip(E), np.flip(k))
+        print("\nTotal Energies: ")
         print(totalEnergy)
         plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
 
