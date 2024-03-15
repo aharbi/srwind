@@ -383,7 +383,7 @@ def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
 def main(args):
     saveName = args.fname+"_{}imgs".format(args.numImgs)
     if args.step == 0:
-        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname=saveName)
+        exp_cos_sim(kernel=args.kernel, numImgs=args.numImgs, fname=saveName)
     elif args.step == 1:
         process_cos_sim(saveName=saveName, loadname=args.loadname)
     else:
@@ -395,6 +395,7 @@ if __name__ == "__main__":
     parser.add_argument("--numImgs", type=int, default=100)
     parser.add_argument("--loadname", default="cos_sim")
     parser.add_argument("--fname", default="cos_sim")
+    parser.add_argument("--kernel", default=1)
     args = parser.parse_args()
     main(args)
     
