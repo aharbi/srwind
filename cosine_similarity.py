@@ -12,6 +12,7 @@ import scipy.stats as stats
 import pdb;
 import visualization
 import json
+import argparse
 
 def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
     """Computes the cosine similarity error between reference patch and predicted HR_patch,
@@ -62,7 +63,7 @@ def cos_similarity(ref_patch: np.ndarray, HR_patch: np.ndarray, avgKernel = 1):
 
     return overlaps, ref_filt_all, hr_filt_all
 
-def exp_cos_sim(kernels=[1, 5, 10, 20]):
+def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10):
     """
     Experiment Physics Metrics: Performs cosine similarity for different averaging amounts
     and computes the energy spectra for the resulting turbulence values.    
@@ -86,7 +87,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20]):
         "kernels": []
     }
 
-    numImgs = 10
+    # pdb.set_trace()
 
     for ii in np.arange(numImgs):
         # step one: load random test result
@@ -177,7 +178,7 @@ def process_cos_sim():
 
     # step 3: plot in bar chart - xdata
     width = 0.25
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(1,1,figsize=(10,8))
     modelList = []
     kernels = Cos_Sim_Dict["kernels"]
     x = np.arange(len(kernels))
@@ -198,14 +199,54 @@ def process_cos_sim():
     ax.legend(loc="upper right", ncols=numModelsPlotted)
     ax.axis([-1, x[-1]+1, 0.99, 1.0])
     ax.set_xlabel("Averaging Kernel Size")
-    ax.set_ylabel("Cosine Similarity")
-    plt.show()    
+    ax.set_ylabel("Cosine Similarity (ua)")
+    # plt.show()    
+    plt.savefig(saveDR+"cosine_similarity_ua.png")
+
+    # step 4: plot in bar chart - ydata
+    width = 0.25
+    fig2,ax2 = plt.subplots(1,1,figsize=(10,8))
+    modelList = []
+    kernels = Cos_Sim_Dict["kernels"]
+    x = np.arange(len(kernels))
+    multiplier = 0
+
+    for model in avgs:
+        offset = width*multiplier                
+        ydata = avgs[model]["avgs_y"]
+        if not(np.all(np.isnan(ydata))):
+            print("Plotting model: {}".format(model))
+            modelList.append(model)
+            bars2 = ax2.bar(x+offset, ydata, width, label=model)
+        
+            multiplier += 1
+
+    numModelsPlotted = len(modelList)
+    ax2.set_xticks(x+numModelsPlotted/2 * width, kernels)
+    ax2.legend(loc="upper right", ncols=numModelsPlotted)
+    ax2.axis([-1, x[-1]+1, 0.99, 1.0])
+    ax2.set_xlabel("Averaging Kernel Size")
+    ax2.set_ylabel("Cosine Similarity (va)")
+    # plt.show()    
+    plt.savefig(saveDR+"cosine_similarity_va.png")
 
     return
 
+def main(args):
+    if args.step == 0:
+        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs)
+    elif args.step == 1:
+        process_cos_sim()
+    else:
+        print("Invalid flag.")
+
 if __name__ == "__main__":
-    exp_cos_sim()
-    # process_cos_sim()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--step", type=int, default=1) # pass 0 for computing or 1 for post-processing
+    parser.add_argument("--numImgs", type=int, default=100)
+    args = parser.parse_args()
+    main(args)
+    
 
 
 

@@ -162,3 +162,5 @@ cython_debug/
 # Dataset
 /dataset
 /figures
+/physics_metrics
+/models
