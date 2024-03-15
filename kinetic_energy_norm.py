@@ -150,8 +150,8 @@ def plot_energy_spectra(fname="wind_spectrum_norm"):
         E = np.mean(Energy_Spectrum[model]['y'], axis=0) / 10000
 
         # add normalization
-        totalEnergy = ig.trapezoid(E,k);
-
+        totalEnergy = ig.trapezoid(E,k)
+        print(totalEnergy)
         plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
 
     plt.xlabel("k (wavenumber)")
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     num_images = args.numImgs
 
     for i in range(num_images):
-        print("Image: {}/{}\n".format(i,num_images))
+        print("\nImage: {}/{}".format(i+1,num_images))
         current_data_matrix, current_label_matrix, prediction_bi, prediction_rr, prediction_rf, prediction_reg_sr3, prediction_diff_sr3 = visualization.compute_random_result()
 
         
@@ -190,10 +190,10 @@ if __name__ == "__main__":
     plot_energy_spectra(fname=saveName)
 
     # save norm data
-    saveDR = "./physics_metrics_server/"
-    saveName = args.fname+"_{}".format(num_images)
-    f = open(saveDR+saveName+".json", "w")
-    json.dump(Energy_Spectrum, f, sort_keys=True, indent=2)
-    f.close()
+    # saveDR = "./physics_metrics_server/"
+    # saveName = args.fname+"_{}".format(num_images)
+    # f = open(saveDR+saveName+".json", "w")
+    # json.dump(Energy_Spectrum, f, sort_keys=True, indent=2)
+    # f.close()
 
 

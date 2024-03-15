@@ -116,7 +116,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10, fname="cos_sim"):
         sr3_dif_results_y = []
         
 
-        print("Image {} : {}".format(ii+1,numImgs))
+        print("\nImage {} : {}".format(ii+1,numImgs))
         for jj in np.arange(numKernels):            
             kernel = kernels[jj]
             print("    kernel: {}".format(kernel))
@@ -254,10 +254,11 @@ def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
     return
 
 def main(args):
+    saveName = args.fname+"_{}imgs".format(args.numImgs)
     if args.step == 0:
-        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname=args.fname)
+        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname=saveName)
     elif args.step == 1:
-        process_cos_sim(saveName=args.fname, loadname=args.loadname)
+        process_cos_sim(saveName=saveName, loadname=args.loadname)
     else:
         print("Invalid flag.")
 
