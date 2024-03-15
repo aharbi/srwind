@@ -8,6 +8,21 @@ import matplotlib.pyplot as plt
 import json
 import argparse
 import visualization
+import pdb
+
+"""
+This code is a simplified form of the implementation in:
+https://github.com/RupaKurinchiVendhan/WiSoSuper/blob/main/energy.py
+
+It takes in an image, normalizes it to itself, and then computes the FFT. Note that it computes 
+the FFT of each row, and then gets the total "k vector" in cycles/pixel frequency space, to that pixel.
+At the end, it computes the average frequency content of a bin of values. These are "cycles/pixel" values, 
+which we compute as the inverse of pixel space. These are NOT k-vectors, as the original implementation
+suggests. We also then normalize to "total energy" to match the scales of all models, which is again 
+absent from the original implementation. We ignore some of the more complicated lines of code in the
+original implementation, which seem unreasonable to include.
+
+"""
 
 Energy_Spectrum = {'HR':  {'x':[], 'y':[]}, 
                        'LR':  {'x':[], 'y':[]}, 
@@ -44,7 +59,6 @@ def kinetic_energy_spectra(
             ndarray: 1xnd vector containing the "frequency" values
         """
 
-        import pdb
         # get frequency axis
         xdims = HR_patch.shape[1] # returns pixels along x-axis
         ydims = HR_patch.shape[0] # gets number of rows in patch
@@ -119,16 +133,24 @@ def kinetic_energy_spectra(
 
     compare_outputs()
 
+    return
+
 
 def plot_energy_spectra(fname="./wind_spectrum_norm"):
     colors = {'HR': 'black', 'LR': 'pink','Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'}
     
+    g = open(fname+".json", "w")
+    json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
+    g.close() 
+
+    pdb.set_trace()
+
     for model in Energy_Spectrum:
         k = (np.mean(Energy_Spectrum[model]['x'], axis=0))
         E = np.mean(Energy_Spectrum[model]['y'], axis=0)
 
         # add normalization
-        totalEnergy = ig.trapezoid(np.flip(E), np.flip(k))
+        totalEnergy = ig.trapezoid(E, k[:-1])
         print("\nTotal Energies: ")
         print(totalEnergy)
         plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
@@ -141,10 +163,7 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
     plt.savefig(fname+".png", dpi=1000, transparent=False, bbox_inches='tight')
     plt.show()
 
-    g = open(fname+".json", "w")
-    json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
-    g.close() 
-
+    return
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
