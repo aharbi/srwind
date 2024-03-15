@@ -95,7 +95,7 @@ def kinetic_energy_spectra(
 
 
     def compare_outputs():
-        for i in range(1):
+        for i in range(2):
             min = current_label_matrix[i,:,:].min()
             max = current_label_matrix[i,:,:].max()
             
@@ -150,10 +150,10 @@ def kinetic_energy_spectra(
 
 def plot_energy_spectra(fname="./wind_spectrum_norm"):
     colors = {'HR': 'black', 'LR': 'pink','Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'}
-    for i in range(1):
-        f = open(fname+"_ch{}.json".format(i), "r")
-        Energy_Spectrum = json.load(f)
-        f.close()
+    for i in range(2):
+        # f = open(fname+"_ch{}.json".format(i), "r")
+        # Energy_Spectrum = json.load(f)
+        # f.close()
 
         for model in Energy_Spectrum:
             k = (np.mean(Energy_Spectrum[model]['x'], axis=0))
