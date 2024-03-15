@@ -178,7 +178,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_bi[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
@@ -193,7 +193,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = curr_label[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
@@ -212,7 +212,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_rr[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
@@ -231,7 +231,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_rf[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
@@ -250,7 +250,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_reg_sr3[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
@@ -269,7 +269,7 @@ def exp_cos_sim(kernel=1, numImgs=10, fname="cos_sim"):
         turb_y = pred_dif_sr3[0,1,:,:]-hr_filt[1,:,:]
 
         # normalize
-        turb_x_norm = (turb_x_norm*255).astype(np.uint8)
+        turb_x_norm = (turb_x*255).astype(np.uint8)
         # turb_x_norm = ((turb_x - turb_x.min()) / (turb_x.max() - turb_x.min()) * 255).astype(np.uint8)
         # Alternative: Normalization against the HR image
         # wind_profile_normalized = ((wind_profile_normalized - min) / (max - min) * 255).astype(np.uint8)
