@@ -6,6 +6,7 @@ import sr3
 import metrics
 import os
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import scipy.ndimage as nd
 import scipy.fft as spf
 import scipy.stats as stats
@@ -337,6 +338,10 @@ def process_KE(saveName="turbulence", loadname="cos_sim_turb_KE_10", kernel=1):
     return
 
 def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
+    
+    # plotting params
+    figsize = (6,4)
+    
     # step 1: load the stored json data
     saveDR = "./physics_metrics_server/"
     fname = loadname
@@ -368,12 +373,12 @@ def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
 
 
     # save processed data
-    f = open(saveDR+saveName+".json", "w")
+    f = open(saveDR+saveName+"_avgs.json", "w")
     json.dump(avgs, f, sort_keys=True, indent=2)
 
     # step 3: plot in bar chart - xdata
     width = 0.25
-    fig,ax = plt.subplots(1,1,figsize=(10,8))
+    fig,ax = plt.subplots(1,1,figsize=figsize)
     modelList = []
     kernels = Cos_Sim_Dict["kernels"]
     x = 2*np.arange(len(kernels))

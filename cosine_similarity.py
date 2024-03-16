@@ -71,7 +71,7 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10, fname="cos_sim"):
     """
 
     # set up saving and results storage
-    saveDR = "./physics_metrics_server/"
+    saveDR = "./data_in_use/"
     try:
         os.mkdir(saveDR)        
     except:
@@ -170,11 +170,17 @@ def exp_cos_sim(kernels=[1, 5, 10, 20], numImgs=10, fname="cos_sim"):
 
 
 def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
-    # step 1: load the stored json data
-    saveDR = "./physics_metrics_server/"
-    fname = loadname
 
-    f = open(saveDR+fname, "r")
+    # plot params
+    figSize = (6,4)
+    capSize = 0.1
+    eColor = (0,0,0,0.4)
+
+    # step 1: load the stored json data
+    # saveDR = "./physics_metrics_server/"
+    # fname = loadname
+
+    f = open(loadname, "r")
     Cos_Sim_Dict = json.load(f)
     f.close()
 
@@ -197,68 +203,70 @@ def process_cos_sim(saveName="cos_sim_data", loadname="cos_sim_data"):
         # pdb.set_trace()
 
     # save processed data
-    f = open(saveDR+saveName+".json", "w")
+    f = open(saveName+"_avgs.json", "w")
     json.dump(avgs, f, sort_keys=True, indent=2)
 
     # step 3: plot in bar chart - xdata
     width = 0.25
-    fig,ax = plt.subplots(1,1,figsize=(10,8))
+    fig,ax = plt.subplots(1,1,figsize=figSize)
     modelList = []
     kernels = Cos_Sim_Dict["kernels"]
     x = 2*np.arange(len(kernels))
     multiplier = 0
 
-    for model in avgs:
+    modelLabels = ["Bicubic", "Ridge Regression", "Random Forest", "SR3 Regression", "SR3 Diffusion"]
+    for model in avgs:        
         offset = width*multiplier                
         xdata = avgs[model]["avgs_x"]
+        xstds = avgs[model]["stds_x"]
         if not(np.all(np.isnan(xdata))):
             print("Plotting model: {}".format(model))
             modelList.append(model)
-            bars = ax.bar(x+offset, xdata, width, label=model)
+            bars = ax.bar(x+offset, xdata, width, label=modelLabels[multiplier], yerr=xstds, capsize=0.5, ecolor=eColor)
         
             multiplier += 1
 
     numModelsPlotted = len(modelList)
     ax.set_xticks(x+numModelsPlotted/2 * width, kernels)
-    ax.legend(loc="lower right", ncols=numModelsPlotted)
-    ax.axis([-1, x[-1]+2, 0.98, 1.0])
+    ax.legend(loc="lower right", ncols=1)
+    ax.axis([-1, x[-1]+2, 0.975, 1.0])
     ax.set_xlabel("Averaging Kernel Size")
     ax.set_ylabel("Cosine Similarity (ua)")
     # plt.show()    
-    plt.savefig(saveDR+saveName+"_ua.png")
+    plt.savefig(saveName+"_ua.png")
 
     # step 4: plot in bar chart - ydata    
-    fig2,ax2 = plt.subplots(1,1,figsize=(10,8))
+    fig2,ax2 = plt.subplots(1,1,figsize=(6,4))
     modelList = []
     multiplier = 0
 
     for model in avgs:
         offset = width*multiplier                
         ydata = avgs[model]["avgs_y"]
+        ystds = avgs[model]["stds_y"]
         if not(np.all(np.isnan(ydata))):
             print("Plotting model: {}".format(model))
             modelList.append(model)
-            bars2 = ax2.bar(x+offset, ydata, width, label=model)
+            bars2 = ax2.bar(x+offset, ydata, width, label=modelLabels[multiplier], yerr=ystds, capsize=capSize, ecolor=eColor)
         
             multiplier += 1
 
     numModelsPlotted = len(modelList)
     ax2.set_xticks(x+numModelsPlotted/2 * width, kernels)
-    ax2.legend(loc="lower right", ncols=numModelsPlotted)
-    ax2.axis([-1, x[-1]+2, 0.98, 1.0])
+    ax2.legend(loc="lower right", ncols=1)
+    ax2.axis([-1, x[-1]+2, 0.975, 1.0])
     ax2.set_xlabel("Averaging Kernel Size")
     ax2.set_ylabel("Cosine Similarity (va)")
     # plt.show()    
-    plt.savefig(saveDR+saveName+"_va.png")
+    plt.savefig(saveName+"_va.png")
 
     return
 
 def main(args):
-    saveName = args.fname+"_{}imgs".format(args.numImgs)
     if args.step == 0:
-        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname=saveName)
+        exp_cos_sim(kernels=[1,5,10,20], numImgs=args.numImgs, fname="cos_sim_{}".format(args.numImgs))
     elif args.step == 1:
-        process_cos_sim(saveName=saveName, loadname=args.loadname)
+        process_cos_sim(saveName=args.savepath, loadname=args.dataset)
     else:
         print("Invalid flag.")
 
@@ -266,8 +274,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--step", type=int, default=1) # pass 0 for computing or 1 for post-processing
     parser.add_argument("--numImgs", type=int, default=100)
-    parser.add_argument("--loadname", default="cos_sim")
-    parser.add_argument("--fname", default="cos_sim")
+    parser.add_argument("--dataset", default="./cos_sim")
+    parser.add_argument("--savepath", default="./cos_sim")
     args = parser.parse_args()
     main(args)
     
