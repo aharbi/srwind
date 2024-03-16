@@ -19,7 +19,6 @@ First, construct a python environment and set up the directory using the "enviro
 
 Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as used by the WiSoSuper Resolution paper. NOTE: there is a lot of data here. If only intending to run testing and validation, the training dataset can be commented out and is unnecessary.
 
-Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as used by the WiSoSuper Resolution paper. NOTE: there is a lot of data here. If only intending to run testing and validation, the training dataset can be commented out and is unnecessary.
 
 ### Descriptions of Functions
 
