@@ -85,7 +85,7 @@ def kinetic_energy_spectra(
         kvals = kvals.flatten()
         hr_psd = hr_psd.flatten()
 
-        numBins = 51
+        numBins = 101
         kbins = np.linspace(0, kvals.max(), numBins)
 
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
