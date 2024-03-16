@@ -168,7 +168,7 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
     plt.tight_layout()
     plt.title("Energy Spectrum")
     plt.legend()
-    plt.savefig(fname+".png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
+    plt.savefig(fname+".png", dpi=1000, transparent=False, bbox_inches='tight')
         # plt.show()
 
     return
@@ -197,7 +197,7 @@ if __name__ == "__main__":
         
     fname=args.savePath
     # pdb.set_trace()
-    g = open(fname+".json".format(i), "w")
+    g = open(fname+".json", "w")
     json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
     g.close() 
 
