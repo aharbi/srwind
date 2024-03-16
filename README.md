@@ -49,6 +49,7 @@ Functions:
 * <b>metrics.py</b>: stores the implementations of most metrics.
 * <b>visualization.py</b>: contains functions to plot example data samples or results.
 * <b>energy_spectrum.py</b>: implementation of the kinetic energy spectrum analysis, used to create Fig. 3 in our report.
+* <b>energy_spectrum_postprocess.py</b>: used to post-process the energy_spectrum.py saved data if wanting to plot after the analysis.
 * <b>cosine_similarity.py</b>: implementation of the cosine similarity metrics and analysis, used to create Fig. 4 in our report.
 
 ## Sample Outputs
