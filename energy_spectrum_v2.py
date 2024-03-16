@@ -74,7 +74,8 @@ def kinetic_energy_spectra(
         # pdb.set_trace()
 
         # get power spectrum
-        hr_psd = np.square(spf.fftn(HR_patch))
+        hr_psd = np.square(np.abs(spf.fftn(HR_patch)))
+
         # pdb.set_trace()
         # putting kVals into 2D space
         freqsX, freqsY = np.meshgrid(freqs,freqs) # returns "grid" of k0k0, k0k1, k0k2,...; k1k0, k1k1, ... etc.
@@ -89,7 +90,7 @@ def kinetic_energy_spectra(
 
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
         
-        pdb.set_trace()
+        # pdb.set_trace()
         # return everything
         return kbins, hist_hr
 
