@@ -157,10 +157,11 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
 
             # add normalization
             pdb.set_trace()
-            totalEnergy = ig.trapezoid(E, k[:-1])
+            ksub = k[:-1]
+            totalEnergy = ig.trapezoid(E, ksub)
             print("\nTotal Energies: ")
             print(totalEnergy)
-            plt.loglog(k, E/totalEnergy, color=colors[model], label=model)
+            plt.loglog(ksub, E/totalEnergy, color=colors[model], label=model)
 
         plt.xlabel("k (cycles/pixel)")
         plt.ylabel("Kinetic Energy")
