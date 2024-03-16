@@ -146,12 +146,12 @@ def kinetic_energy_spectra(
 
 def plot_energy_spectra(fname="./wind_spectrum_norm"):
     colors = {'HR': 'black', 'LR': 'pink','Bicubic': 'tab:blue', 'Ridge Regression': 'tab:orange', 'Random Forest': 'tab:green', 'SR3 (Regression)': 'tab:red', 'SR3 (Diffusion)': 'tab:purple'}
-    for i in range(2):
-        # f = open(fname+"_ch{}.json".format(i), "r")
-        # Energy_Spectrum = json.load(f)
-        # f.close()
+    # f = open(fname+"_ch{}.json".format(i), "r")
+    # Energy_Spectrum = json.load(f)
+    # f.close()
 
-        for model in Energy_Spectrum:
+    for model in Energy_Spectrum:
+        if not(model=="LR"):
             k = (np.mean(Energy_Spectrum[model]['x'], axis=0))
             E = np.mean(Energy_Spectrum[model]['y'], axis=0)
 
@@ -163,12 +163,12 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
             print(totalEnergy)
             plt.loglog(ksub, E/totalEnergy, color=colors[model], label=model)
 
-        plt.xlabel("k (cycles/pixel)")
-        plt.ylabel("Kinetic Energy")
-        plt.tight_layout()
-        plt.title("Energy Spectrum")
-        plt.legend()
-        plt.savefig(fname+"_ch{}.png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
+    plt.xlabel("k (cycles/pixel)")
+    plt.ylabel("Energy")
+    plt.tight_layout()
+    plt.title("Energy Spectrum")
+    plt.legend()
+    plt.savefig(fname+"_ch{}.png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
         # plt.show()
 
     return
@@ -197,7 +197,7 @@ if __name__ == "__main__":
         
     fname=args.savePath
     # pdb.set_trace()
-    g = open(fname+"_ch{}.json".format(i), "w")
+    g = open(fname+".json".format(i), "w")
     json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
     g.close() 
 
