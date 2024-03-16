@@ -156,7 +156,7 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
             E = np.mean(Energy_Spectrum[model]['y'], axis=0)
 
             # add normalization
-            pdb.set_trace()
+            # pdb.set_trace()
             ksub = k[:-1]
             totalEnergy = ig.trapezoid(E, ksub)
             print("\nTotal Energies: ")
