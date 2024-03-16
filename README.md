@@ -19,9 +19,22 @@ First, construct a python environment and set up the directory using the "enviro
 
 Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as used by the WiSoSuper Resolution paper. NOTE: there is a lot of data here. If only intending to run testing and validation, the training dataset can be commented out and is unnecessary.
 
+Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as used by the WiSoSuper Resolution paper. NOTE: there is a lot of data here. If only intending to run testing and validation, the training dataset can be commented out and is unnecessary.
+
 ### Descriptions of Functions
+
+Models:
+* <b>llr.py</b>: implementation of the linear regression models: ridge regression and random forest.
+* <b>unet.py</b>: implementation of the UNet architecture used for the SR3 regression and diffusion models.
+* <b>sr3.py</b>: main implementation of the SR3 regression and diffusion models.
+* <b>diffusion_noise_conditioned.py</b>: alternative implementation of the diffusion model, conditioned on noise rather than timesteps.
+* Trained models are available in the ''models' folder.
+
+Functions:
+* <b>util.py</b>: contains util functions used in the other functions.
 * <b>exp.py</b>: functions to carry out main experiments in the code.
 * <b>metrics.py</b>: stores the implementations of most metrics.
+* <b>visualization.py</b>: contains functions to plot example data samples or results.
 * <b>energy_spectrum.py</b>: implementation of the kinetic energy spectrum analysis, used to create Fig. 3 in our report.
 * <b>cosine_similarity.py</b>: implementation of the cosine similarity metrics and analysis, used to create Fig. 4 in our report.
 
@@ -46,3 +59,5 @@ Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as
 ![title](figures/18.png)
 ![title](figures/19.png)
 ![title](figures/20.png)
+
+
