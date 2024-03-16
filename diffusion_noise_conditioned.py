@@ -10,7 +10,8 @@ from tqdm import tqdm
 
 import dataset
 
-#UNet model - conditioned on noise_level
+#UNet model conditioned on noise_level
+#Similar adaptation as the file unet.py
 
 class DoubleConvBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int):
@@ -300,15 +301,13 @@ class Diffusion(nn.Module):
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_features = 256
-    channels = 4 # 4 is for 2 position coordinates and 2 components of speed
+    channels = 4
     num_epochs = 30
     batch_size = 64
     num_timesteps = 400
     size_training = 100
 
     diffusion_model = Diffusion(device=device, num_features = num_features, channels = channels, num_timesteps=num_timesteps)
-
-    # wind_dataset = dataset.WindDataset("dataset/data_matrix.npy", "dataset/label_matrix.npy")
     
     # To implement only on sub sample
     path = "dataset/train"
