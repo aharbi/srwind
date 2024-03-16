@@ -5,10 +5,10 @@ Super-resolution of wind data using machine learning techniques. The repository 
 - Denoising Diffusion Models: Implementation of the algorithm in ["Denoising Diffusion Probabilistic Models"](https://arxiv.org/pdf/2006.11239.pdf) with modification to handle super-resolution from ["Image Super-Resolution via Iterative Refinement"](https://arxiv.org/pdf/2104.07636.pdf). Trained model weights are available in the repository.
 
 ## Acknowledgements
-The functions unet.py and sr3.py are adapted from the implementation at: https://github.com/TeaPearce/Conditional_Diffusion_MNIST.
-The functions energy_spectrum.py, kinetic_energy_initial.py, and kinetic_energy_initial_with_post_normalization.py are adapted from the implementation at: https://github.com/RupaKurinchiVendhan/WiSoSuper/blob/main/energy.py.
+The functions unet.py and sr3.py are adapted from the implementation at: https://github.com/TeaPearce/Conditional_Diffusion_MNIST.\n\n
+The functions energy_spectrum.py, kinetic_energy_initial.py, and kinetic_energy_initial_with_post_normalization.py are adapted from the implementation at: https://github.com/RupaKurinchiVendhan/WiSoSuper/blob/main/energy.py.\n
 
-The SR3 algorithm was originally put forth by Saharia et al.: 
+The SR3 algorithm was originally put forth by Saharia et al.: \n
 [1] C. Saharia, J. Ho, W. Chan, T. Salimans, D. J. Fleet, and M. Norouzi, “Image Super-Resolution Via Iterative Refinement,” IEEE Trans. Pattern Anal. Mach. Intell., pp. 1–14, 2022, doi: 10.1109/TPAMI.2022.3204461.
 
 
