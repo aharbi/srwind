@@ -104,39 +104,39 @@ def kinetic_energy_spectra(
             image = current_label_matrix[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['HR']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['HR']['y'].append(HR_ek)
+            Energy_Spectrum['HR']['y'].append(HR_ek.tolist())
     
             # LOW RES
             image = current_data_matrix[i,:,:]
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['LR']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['LR']['y'].append(HR_ek)
+            Energy_Spectrum['LR']['y'].append(HR_ek.tolist())
     
             # BICUBIC
             image = prediction_bi[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Bicubic']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['Bicubic']['y'].append(HR_ek)
+            Energy_Spectrum['Bicubic']['y'].append(HR_ek.tolist())
     
             image = prediction_rr[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Ridge Regression']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['Ridge Regression']['y'].append(HR_ek)
+            Energy_Spectrum['Ridge Regression']['y'].append(HR_ek.tolist())
     
             image = prediction_rf[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['Random Forest']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['Random Forest']['y'].append(HR_ek)
+            Energy_Spectrum['Random Forest']['y'].append(HR_ek.tolist())
     
             image = prediction_reg_sr3[i,:,:]            
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['SR3 (Regression)']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek)
+            Energy_Spectrum['SR3 (Regression)']['y'].append(HR_ek.tolist())
     
             image = prediction_diff_sr3[i,:,:]        
             HR_kvals2, HR_ek = energy_spectrum(image)
             Energy_Spectrum['SR3 (Diffusion)']['x'].append(HR_kvals2.tolist())
-            Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek)
+            Energy_Spectrum['SR3 (Diffusion)']['y'].append(HR_ek.tolist())
 
 
     compare_outputs()        
@@ -195,7 +195,7 @@ if __name__ == "__main__":
         )
         
     fname=args.savePath
-    pdb.set_trace()
+    # pdb.set_trace()
     g = open(fname+"_ch{}.json".format(i), "w")
     json.dump(Energy_Spectrum, g, sort_keys=True, indent=2)   
     g.close() 
