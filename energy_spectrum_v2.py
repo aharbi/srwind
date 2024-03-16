@@ -85,7 +85,7 @@ def kinetic_energy_spectra(
         kvals = kvals.flatten()
         hr_psd = hr_psd.flatten()
 
-        numBins = 21
+        numBins = 31
         kbins = np.linspace(0, kvals.max(), numBins)
 
         hist_hr,_,_ = stats.binned_statistic(kvals, hr_psd, statistic="mean", bins=kbins)
@@ -168,7 +168,7 @@ def plot_energy_spectra(fname="./wind_spectrum_norm"):
     plt.tight_layout()
     plt.title("Energy Spectrum")
     plt.legend()
-    plt.savefig(fname+"_ch{}.png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
+    plt.savefig(fname+".png".format(i), dpi=1000, transparent=False, bbox_inches='tight')
         # plt.show()
 
     return
