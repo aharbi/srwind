@@ -39,7 +39,7 @@ Models:
 * Trained models are available in the ''models' folder.
 
 Functions:
-* <b>util.py</b>: contains util functions used in the other functions.
+* <b>util.py</b>: contains useful functions for the other functions, including bicubic interpolation.
 * <b>exp.py</b>: functions to carry out main experiments in the code.
 * <b>metrics.py</b>: stores the implementations of most metrics.
 * <b>visualization.py</b>: contains functions to plot example data samples or results.
