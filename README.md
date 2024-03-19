@@ -37,7 +37,7 @@ Next, run the bash script ''dataset.sh.'' This will download the NREL dataset as
 ### Descriptions of Functions
 
 Models:
-* <b>llr.py</b>: implementation of the linear regression models: ridge regression and random forest.
+* <b>llr.py</b>: implementation of the local regression models: ridge regression and random forest.
 * <b>unet.py</b>: implementation of the UNet architecture used for the SR3 regression and diffusion models.
 * <b>sr3.py</b>: main implementation of the SR3 regression and diffusion models.
 * <b>diffusion_noise_conditioned.py</b>: alternative implementation of the diffusion model, conditioned on noise rather than timesteps.
